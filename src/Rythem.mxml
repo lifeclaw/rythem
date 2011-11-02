@@ -2,10 +2,10 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="903" height="564" creationComplete="bootstrap()">
+					   width="903" height="564" creationComplete="bootstrap()" xmlns:local="*" xmlns:view="com.webpluz.view.*">
 	<fx:Style source="Rythem.css"/>
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<local:RythemContext contextView="{this}"/>
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
@@ -37,7 +37,10 @@
 			
 		]]>
 	</fx:Script>
-	<s:Button right="5" top="5" label="运行"/>
+	<s:HGroup right="5" top="3" horizontalAlign="right" verticalAlign="middle">
+		<s:Button label="运行"/>
+		<view:ProxySelector/>
+	</s:HGroup>
 	<mx:TabNavigator left="5" right="5" top="8" bottom="5">
 		<s:NavigatorContent width="100%" height="100%" label="运行日志">
 			<mx:HDividedBox left="0" right="0" top="0" bottom="0">
@@ -69,8 +72,7 @@
 				
 			</mx:HDividedBox>
 		</s:NavigatorContent>
-		<s:NavigatorContent width="100%" height="100%" label="网络设置">
-			
+		<s:NavigatorContent width="100%" height="100%" label="网络设置">	
 		</s:NavigatorContent>
 		<s:NavigatorContent width="100%" height="100%" label="代理规则">
 		</s:NavigatorContent>

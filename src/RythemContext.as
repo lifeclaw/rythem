@@ -1,5 +1,7 @@
 package
 {
+	import com.jo2.event.PayloadEvent;
+	import com.webpluz.command.UpdateSystemProxyCommand;
 	import com.webpluz.view.*;
 	
 	import flash.display.DisplayObjectContainer;
@@ -21,7 +23,7 @@ package
 		
 		//綁定事件和命令，當事件發生的時候，相應的命令會被實例化執行
 		private function bootstrapCommands():void{
-			
+			this.commandMap.mapEvent(PayloadEvent.CHANGE, UpdateSystemProxyCommand);
 		}
 		
 		//初始化注入

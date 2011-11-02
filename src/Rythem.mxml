@@ -2,19 +2,29 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="903" height="564" creationComplete="bootstrap()" xmlns:local="*" xmlns:view="com.webpluz.view.*">
+					   width="903" height="564" applicationComplete="bootstrap()" xmlns:local="*" xmlns:view="com.webpluz.view.*">
 	<fx:Style source="Rythem.css"/>
 	<fx:Declarations>
-		<local:RythemContext contextView="{this}"/>
+		<local:RythemContext contextView="{this}" startupComplete="contextStartupComplete(event)"/>
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.webpluz.service.*;
+			
+			import flash.events.ServerSocketConnectEvent;
+			
 			import mx.collections.ArrayCollection;
+			
+			import org.robotlegs.base.ContextEvent;
 			
 			import spark.events.GridSelectionEvent;
 			[Bindable]protected var requestListData:ArrayCollection;
+			
+			[Inject]
+			public var proxyService:ProxyService;
 			protected function bootstrap():void {
 				requestListData = new ArrayCollection();
+				/*
 				for(var i:int=0;i<20;++i){
 					var o:Object = {
 						"number":i,
@@ -25,7 +35,30 @@
 					};
 					requestListData.addItem(o);
 				}
+				*/
+				proxyService = new ProxyService();
+				proxyService.addEventListener(ProxyServiceEvent.PROXYSERVICEEVENT_CONNECTED,onConnect);
+				//proxyService.addEventListener(Event.COMPLETE,onCompelte);
+				this.listen("127.0.0.1",8828);
 				return;
+			}
+			
+			public function listen(ip:String,port:Number):void{
+				proxyService.listen(ip,port);
+			}
+			
+			private var i:Number=0;
+			private function onConnect(e:ProxyServiceEvent):void{
+				var p:Pipe = e.pipe;
+				
+				requestListData.addItem({
+					"number":i,
+					"resultCode":"200",
+					"host":p.server,
+					"serverIp":"",
+					"url":"/"
+				});
+				i++;
 			}
 			
 			protected function requestList_selectionChangeHandler(event:GridSelectionEvent):void
@@ -33,6 +66,10 @@
 				var dg:DataGrid = event.target as DataGrid;
 				var o:Object = dg.selectedItem;
 				holdplaceText.text = o.number +" "+o.resultCode+" "+o.host+" "+o.serverIp+" "+o.url;
+			}
+			
+			protected function contextStartupComplete(event:ContextEvent):void{
+				//proxyService.addEventListener(Event.CONNECT,onConnect);
 			}
 			
 		]]>

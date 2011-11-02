@@ -4,6 +4,8 @@ package com.webpluz.command
 	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfigs;
 	
+	import flash.desktop.NativeApplication;
+	
 	import org.robotlegs.mvcs.Command;
 	
 	public final class UpdateSystemProxyCommand extends Command
@@ -30,6 +32,8 @@ package com.webpluz.command
 				);
 				manager.proxy = config;
 			}
+			
+			
 		}
 		
 		private function onComplete(e:PayloadEvent):void{

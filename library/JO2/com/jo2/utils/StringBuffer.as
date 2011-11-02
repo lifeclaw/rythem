@@ -10,8 +10,10 @@ package com.jo2.utils
 		}
 		
 		public function append(value:String):void{
-			_buffer += value;
-			_components = _buffer.split('\r\n').filter(function(item:String, index:uint, arr:Array):Boolean{
+			//sometimes text output from Windows CommandLine contains \r and \r\n
+			//in order to make our life easier when spliting the string, we remove all \r
+			_buffer += value.replace(/\r/g, '');
+			_components = _buffer.split('\n').filter(function(item:String, index:uint, arr:Array):Boolean{
 				return !item.match(/^\s*$/);
 			});
 		}

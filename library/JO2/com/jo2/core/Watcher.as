@@ -39,7 +39,6 @@ package com.jo2.core
 		
 		protected function onTimer(e:TimerEvent):void{
 			if(this.checkChange()){
-				//this.dispatchEvent(new Event(Event.CHANGE));
 				this.dispatchEvent(new PayloadEvent(PayloadEvent.CHANGE));
 			}
 		}

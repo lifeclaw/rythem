@@ -1,6 +1,8 @@
 package
 {
 	import com.jo2.event.PayloadEvent;
+	import com.jo2.system.IProxyManager;
+	import com.jo2.system.ProxyManager;
 	import com.webpluz.command.UpdateSystemProxyCommand;
 	import com.webpluz.view.*;
 	
@@ -28,7 +30,7 @@ package
 		
 		//初始化注入
 		private function bootstrapInjector():void{
-			
+			this.injector.mapValue(IProxyManager, ProxyManager.getProxyManager());
 		}
 		
 		//綁定視圖組件與代理

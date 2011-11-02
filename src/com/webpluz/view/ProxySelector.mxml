@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:ComboBox xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:DropDownList xmlns:fx="http://ns.adobe.com/mxml/2009" 
 	    xmlns:s="library://ns.adobe.com/flex/spark" 
 	    xmlns:mx="library://ns.adobe.com/flex/mx"
 	    selectedIndex="0" labelField="label">
@@ -14,4 +14,4 @@
 				   autoConfigURL="http://txp-01.tencent.com/lvsproxy.pac"/>
 		</s:ArrayCollection>
 	</s:dataProvider>
-</s:ComboBox>
+</s:DropDownList>

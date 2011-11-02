@@ -8,5 +8,9 @@ package com.webpluz.view
 		{
 			super();
 		}
+		
+		override public function onRegister():void{
+			
+		}
 	}
 }

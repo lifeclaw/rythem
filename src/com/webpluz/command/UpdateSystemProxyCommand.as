@@ -17,8 +17,9 @@ package com.webpluz.command
 		}
 		
 		override public function execute():void{
-			//change system proxy according to user's selection
+			//specify that this command needs to wait for something, so don't release me so fast
 			this.commandMap.detain(this);
+			//change system proxy according to user's selection
 			if(manager){
 				manager.addEventListener(PayloadEvent.COMPLETE, onComplete);
 				var config:ProxyConfigs = new ProxyConfigs(
@@ -33,6 +34,7 @@ package com.webpluz.command
 		
 		private function onComplete(e:PayloadEvent):void{
 			trace(manager.proxy);
+			//tell commandMap this command is done
 			this.commandMap.release(this);
 		}
 	}

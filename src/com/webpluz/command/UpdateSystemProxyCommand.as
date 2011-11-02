@@ -37,6 +37,7 @@ package com.webpluz.command
 		}
 		
 		private function onComplete(e:PayloadEvent):void{
+			manager.removeEventListener(PayloadEvent.COMPLETE, onComplete);
 			trace(manager.proxy);
 			//tell commandMap this command is done
 			this.commandMap.release(this);

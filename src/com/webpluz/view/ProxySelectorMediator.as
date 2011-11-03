@@ -1,7 +1,5 @@
 package com.webpluz.view
 {
-	import com.jo2.event.PayloadEvent;
-	
 	import flash.events.Event;
 	
 	import org.robotlegs.mvcs.Mediator;
@@ -15,6 +13,10 @@ package com.webpluz.view
 			super();
 		}
 		
+		public function get selectedItem():String{
+			return this.proxySelector.selectedItem;
+		}
+		
 		//覆蓋此方法來註冊UI組件的事件
 		override public function onRegister():void{
 			this.eventMap.mapListener(proxySelector, Event.CHANGE, onProxySelectorChange);
@@ -22,7 +24,7 @@ package com.webpluz.view
 		
 		//處理UI組件的事件
 		private function onProxySelectorChange(e:Event):void{
-			this.dispatch(new PayloadEvent(PayloadEvent.CHANGE, proxySelector.selectedItem));
+			this.dispatch(new Event(Event.CHANGE));
 		}
 	}
 }

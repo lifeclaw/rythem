@@ -7,6 +7,8 @@ package com.webpluz.command
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	
+	import flash.desktop.NativeApplication;
+	
 	import org.robotlegs.mvcs.Command;
 	
 	public final class UpdateSystemProxyCommand extends Command

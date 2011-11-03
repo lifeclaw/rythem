@@ -28,7 +28,7 @@ package
 		
 		//綁定事件和命令，當事件發生的時候，相應的命令會被實例化執行
 		private function bootstrapCommands():void{
-			this.commandMap.mapEvent(Event.CHANGE, UpdateSystemProxyCommand);			
+			this.commandMap.mapEvent(Event.CHANGE, UpdateSystemProxyCommand);
 		}
 		
 		//初始化注入

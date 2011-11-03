@@ -2,7 +2,7 @@ package com.webpluz.command
 {
 	import com.jo2.event.PayloadEvent;
 	import com.jo2.system.IProxyManager;
-	import com.jo2.system.ProxyConfigs;
+	import com.jo2.system.ProxyConfig;
 	
 	import org.robotlegs.mvcs.Command;
 	
@@ -21,8 +21,8 @@ package com.webpluz.command
 			this.commandMap.detain(this);
 			//change system proxy according to user's selection
 			if(manager){
-				manager.addEventListener(PayloadEvent.COMPLETE, onComplete);
-				var config:ProxyConfigs = new ProxyConfigs(
+				manager.addEventListener(PayloadEvent.SUCCESS, onSuccess);
+				var config:ProxyConfig = new ProxyConfig(
 					event.payload.server,
 					uint(event.payload.port),
 					event.payload.autoConfigURL,
@@ -32,8 +32,8 @@ package com.webpluz.command
 			}
 		}
 		
-		private function onComplete(e:PayloadEvent):void{
-			manager.removeEventListener(PayloadEvent.COMPLETE, onComplete);
+		private function onSuccess(e:PayloadEvent):void{
+			manager.removeEventListener(PayloadEvent.SUCCESS, onSuccess);
 			trace(manager.proxy);
 			//tell commandMap this command is done
 			this.commandMap.release(this);

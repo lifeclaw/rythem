@@ -2,139 +2,20 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="903" height="564" applicationComplete="bootstrap()" xmlns:local="*" xmlns:view="com.webpluz.view.*">
+					   width="903" height="564" creationComplete="init(event)">
 	<fx:Style source="Rythem.css"/>
-	<fx:Declarations>
-		<local:RythemContext contextView="{this}" startupComplete="contextStartupComplete(event)"/>
-	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import com.webpluz.service.*;
+			import mx.events.FlexEvent;
 			
-			import flash.events.ServerSocketConnectEvent;
-			
-			import mx.collections.ArrayCollection;
-			
-			import org.robotlegs.base.ContextEvent;
-			
-			import spark.events.GridSelectionEvent;
-			[Bindable]protected var requestListData:ArrayCollection;
-			
-			[Inject]
-			public var proxyService:ProxyService;
-			protected function bootstrap():void {
-				requestListData = new ArrayCollection();
-				/*
-				for(var i:int=0;i<20;++i){
-					var o:Object = {
-						"number":i,
-						"resultCode":"200",
-						"host":"www.qq.com",
-						"serverIp":"234.32.33.24",
-						"url":"/"
-					};
-					requestListData.addItem(o);
-				}
-				*/
-				proxyService = new ProxyService();
-				proxyService.addEventListener(HTTPHeadersEvent.HTTP_HEADERS_EVENT,onConnect);
-				//proxyService.addEventListener(Event.COMPLETE,onCompelte);
-				this.listen("127.0.0.1",8828);
-				return;
-			}
-			
-			public function listen(ip:String,port:Number):void{
-				proxyService.listen(ip,port);
-			}
-			
-			private var index:Number=0;
-			private function onConnect(e:HTTPHeadersEvent):void{
+			protected function init(event:FlexEvent):void{
 				
-				
-//				for(var i:int=0,l:int=e.requestHeaders.length;i<l;++i){
-//				trace(e.requestHeaders[i].name +":"+e.requestHeaders[i].value);
-//				}
-//				trace("========"+e.requestSignature+"==========");
-//				
-//				for(i=0,l=e.responseHeaders.length;i<l;++i){
-//				trace(e.responseHeaders[i].name +":"+e.responseHeaders[i].value);
-//				}
-//				trace("========"+e.responseSignature+"==========");
-				
-				var o:Object = new Object();
-				var i:int;
-				var item:URLRequestHeader;
-				for(i=0;i<e.requestHeaders.length;++i){
-					item = e.requestHeaders[i];
-					o[item.name]=item.value;
-				}
-				for(i=0;i<e.responseHeaders.length;++i){
-					item = e.responseHeaders[i];
-					o[item.name]=item.value;
-				}
-				requestListData.addItem({
-					"number":index,
-					"resultCode":"200",
-					"host":o['Host'],
-					"serverIp":e.remoteAddress,
-					"url":e.requestSignature.split(' ')[2]
-				});
-				index++;
-			}
-			
-			protected function requestList_selectionChangeHandler(event:GridSelectionEvent):void
-			{
-				var dg:DataGrid = event.target as DataGrid;
-				var o:Object = dg.selectedItem;
-				holdplaceText.text = o.number +" "+o.resultCode+" "+o.host+" "+o.serverIp+" "+o.url;
-			}
-			
-			protected function contextStartupComplete(event:ContextEvent):void{
-				//proxyService = new ProxyService();
-				//proxyService.addEventListener(ProxyServiceEvent.PROXYSERVICEEVENT_CONNECTED,onConnect);
 			}
 			
 		]]>
 	</fx:Script>
-	<s:HGroup right="5" top="3" horizontalAlign="right" verticalAlign="middle">
-		<s:Button label="运行"/>
-		<view:ProxySelector width="180"/>
-	</s:HGroup>
-	<mx:TabNavigator left="5" right="5" top="8" bottom="5">
-		<s:NavigatorContent width="100%" height="100%" label="运行日志">
-			<mx:HDividedBox left="0" right="0" top="0" bottom="0">
-				
-				<mx:Canvas label="Canvas 1" width="300" height="100%" color="0x323232" backgroundColor="#ACACAC">
-					<s:DataGrid id="requestList" left="0" right="0" top="0" bottom="0"
-								dataProvider="{requestListData}" editable="false" enabled="true"
-								requestedRowCount="4"
-								selectionChange="requestList_selectionChangeHandler(event)">
-						<s:columns>
-							<s:ArrayList>
-								<s:GridColumn width="40" dataField="number" headerText="#"></s:GridColumn>
-								<s:GridColumn width="40" dataField="resultCode" headerText="result"></s:GridColumn>
-								<s:GridColumn width="100" dataField="host" headerText="host"></s:GridColumn>
-								<s:GridColumn width="100" dataField="serverIp"
-											  headerText="ServerIP"></s:GridColumn>
-								<s:GridColumn width="100" dataField="url" headerText="URL"></s:GridColumn>
-								<s:GridColumn width="1" dataField="placeholder" headerText=" "></s:GridColumn>
-							</s:ArrayList>
-						</s:columns>
-					</s:DataGrid>
-				</mx:Canvas>
-				
-				<mx:Canvas label="Canvas 2" width="100%" height="100%" backgroundColor="#323232" >
-					<mx:Label id="holdplaceText" left="0" right="0" top="0" height="20"
-							  color="#D25E5E" fontWeight="bold" text="Add components here"
-							  textAlign="center"/>
-				</mx:Canvas>
-				
-			</mx:HDividedBox>
-		</s:NavigatorContent>
-		<s:NavigatorContent width="100%" height="100%" label="网络设置">	
-		</s:NavigatorContent>
-		<s:NavigatorContent width="100%" height="100%" label="代理规则">
-		</s:NavigatorContent>
-	</mx:TabNavigator>
+	<fx:Declarations>
+	</fx:Declarations>
+	
 </s:WindowedApplication>
 

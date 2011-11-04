@@ -10,7 +10,6 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="1" linkType="1" path="libs"/>
-      <libraryPathEntry kind="3" linkType="1" path="library/robotlegs_1.5.2/bin/robotlegs-framework-v1.5.2.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="library/JO2/JO2.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>

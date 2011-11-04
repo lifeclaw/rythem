@@ -2,20 +2,85 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="903" height="564" creationComplete="init(event)">
+					   width="960" height="600" creationComplete="init(event)" xmlns:view="com.webpluz.view.*">
 	<fx:Style source="Rythem.css"/>
 	<fx:Script>
 		<![CDATA[
+			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			
 			protected function init(event:FlexEvent):void{
 				
 			}
 			
+			protected function onSettingButtonClick(event:MouseEvent):void{
+				currentState = 'setting';
+			}
+			
+			protected function onSettingWindowClose(event:CloseEvent):void{
+				currentState = 'default';
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 	</fx:Declarations>
-	
+	<s:states>
+		<s:State name="default"/>
+		<s:State name="setting"/>
+	</s:states>
+	<s:VGroup left="-1" right="-1" height="100%" gap="0">
+		<!--- setting and menu on the top -->
+		<s:HGroup width="100%" horizontalAlign="right" paddingRight="10" paddingTop="10" verticalAlign="middle">
+			<s:Button label="setting" click="onSettingButtonClick(event)"/>
+			<s:DropDownList selectedIndex="0">
+				<s:dataProvider>
+					<s:ArrayCollection>
+						<fx:String>Dev Env</fx:String>
+						<fx:String>Test Env 1</fx:String>
+						<fx:String>Test Env 2</fx:String>
+						<fx:String>Test Env 3</fx:String>
+						<fx:String>Preview Env</fx:String>
+						<fx:String>Live Env</fx:String>
+					</s:ArrayCollection>
+				</s:dataProvider>
+			</s:DropDownList>
+		</s:HGroup>
+		<mx:HDividedBox width="100%" height="100%">
+			<mx:TabNavigator width="30%" height="100%" paddingTop="0">
+				<!--- request list -->
+				<s:NavigatorContent label="Requests">
+					<s:List id="requestList" borderVisible="false" width="100%" height="100%"/>
+				</s:NavigatorContent>
+			</mx:TabNavigator>
+			<mx:TabNavigator width="70%" height="100%" paddingTop="0">
+				<s:NavigatorContent label="Inspector">
+					<mx:VDividedBox width="100%" height="100%">
+						<s:Group width="100%" height="50%">
+							<view:ColorRect fillColor="0xCCCCCC"/>
+						</s:Group>
+						<s:Group width="100%" height="50%">
+							<view:ColorRect fillColor="0xCCCCCC"/>
+						</s:Group>
+					</mx:VDividedBox>
+				</s:NavigatorContent>
+				<s:NavigatorContent label="Rules">
+					<!--- response replace rules components -->
+				</s:NavigatorContent>
+			</mx:TabNavigator>
+		</mx:HDividedBox>
+	</s:VGroup>
+	<!--- setting panel -->
+	<view:ColorRect includeIn="setting" fillColor="0" fillAlpha="0.6"/>
+	<s:TitleWindow includeIn="setting" horizontalCenter="0" verticalCenter="0" width="700" height="400" title="Settings"
+				   close="onSettingWindowClose(event)">
+		<mx:TabNavigator left="10" right="10" top="10" bottom="10">
+			<s:NavigatorContent label="Hosts">
+				<s:Scroller width="100%" height="100%">
+					
+				</s:Scroller>
+			</s:NavigatorContent>
+		</mx:TabNavigator>
+	</s:TitleWindow>
 </s:WindowedApplication>
 

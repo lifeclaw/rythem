@@ -1,6 +1,5 @@
 package com.webpluz.view
 {
-	import com.jo2.event.PayloadEvent;
 	import flash.events.Event;
 
 	import org.robotlegs.mvcs.Mediator;

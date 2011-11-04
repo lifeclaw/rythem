@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:DropDownList xmlns:fx="http://ns.adobe.com/mxml/2009" 
-	    xmlns:s="library://ns.adobe.com/flex/spark" 
-	    xmlns:mx="library://ns.adobe.com/flex/mx"
-	    selectedIndex="0" labelField="label">
-	<fx:Declarations>	
+<s:DropDownList xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				selectedIndex="0"
+				labelField="label">
+	<fx:Declarations>
 	</fx:Declarations>
 	<!--- 演示用的數據，應該由command通過讀取配置（本地或遠程）來填充 -->
 	<s:dataProvider>
 		<s:ArrayCollection>
-			<fx:Object label="no proxy" enabled="false"/>
-			<fx:Object label="127.0.0.1:8828" enabled="true" server="127.0.0.1" port="8828"/>
-			<fx:Object label="proxy.tencent.com:8080" enabled="true" server="proxy.tencent.com" port="8080"
-				   autoConfigURL="http://txp-01.tencent.com/lvsproxy.pac"/>
+			<fx:Object label="no proxy"
+					   enabled="false"/>
+			<fx:Object label="127.0.0.1:8828"
+					   enabled="true"
+					   server="127.0.0.1"
+					   port="8828"/>
+			<fx:Object label="proxy.tencent.com:8080"
+					   enabled="true"
+					   server="proxy.tencent.com"
+					   port="8080"
+					   autoConfigURL="http://txp-01.tencent.com/lvsproxy.pac"/>
 		</s:ArrayCollection>
 	</s:dataProvider>
 </s:DropDownList>

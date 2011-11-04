@@ -37,7 +37,7 @@
 				}
 				*/
 				proxyService = new ProxyService();
-				proxyService.addEventListener(ProxyServiceEvent.PROXYSERVICEEVENT_CONNECTED,onConnect);
+				proxyService.addEventListener(HTTPHeadersEvent.HTTP_HEADERS_EVENT,onConnect);
 				//proxyService.addEventListener(Event.COMPLETE,onCompelte);
 				this.listen("127.0.0.1",8828);
 				return;
@@ -47,18 +47,39 @@
 				proxyService.listen(ip,port);
 			}
 			
-			private var i:Number=0;
-			private function onConnect(e:ProxyServiceEvent):void{
-				var p:Pipe = e.pipe;
+			private var index:Number=0;
+			private function onConnect(e:HTTPHeadersEvent):void{
 				
+				
+//				for(var i:int=0,l:int=e.requestHeaders.length;i<l;++i){
+//				trace(e.requestHeaders[i].name +":"+e.requestHeaders[i].value);
+//				}
+//				trace("========"+e.requestSignature+"==========");
+//				
+//				for(i=0,l=e.responseHeaders.length;i<l;++i){
+//				trace(e.responseHeaders[i].name +":"+e.responseHeaders[i].value);
+//				}
+//				trace("========"+e.responseSignature+"==========");
+				
+				var o:Object = new Object();
+				var i:int;
+				var item:URLRequestHeader;
+				for(i=0;i<e.requestHeaders.length;++i){
+					item = e.requestHeaders[i];
+					o[item.name]=item.value;
+				}
+				for(i=0;i<e.responseHeaders.length;++i){
+					item = e.responseHeaders[i];
+					o[item.name]=item.value;
+				}
 				requestListData.addItem({
-					"number":i,
+					"number":index,
 					"resultCode":"200",
-					"host":p.server,
-					"serverIp":"",
-					"url":"/"
+					"host":o['Host'],
+					"serverIp":e.remoteAddress,
+					"url":e.requestSignature.split(' ')[2]
 				});
-				i++;
+				index++;
 			}
 			
 			protected function requestList_selectionChangeHandler(event:GridSelectionEvent):void
@@ -69,7 +90,8 @@
 			}
 			
 			protected function contextStartupComplete(event:ContextEvent):void{
-				//proxyService.addEventListener(Event.CONNECT,onConnect);
+				//proxyService = new ProxyService();
+				//proxyService.addEventListener(ProxyServiceEvent.PROXYSERVICEEVENT_CONNECTED,onConnect);
 			}
 			
 		]]>

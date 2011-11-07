@@ -1,0 +1,11 @@
+{
+	"projects": [
+		{
+			"name": "Test Env",
+			"rules": [
+				{"type":"hosts", "value":"www.qq.com", "replace":"127.0.0.1"},
+				{"type":"hosts", "value":"web.qq.com", "replace":"127.0.0.1"}
+			]
+		}
+	]
+}

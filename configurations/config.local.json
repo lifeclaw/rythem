@@ -1,0 +1,18 @@
+{
+	"projects": [
+		{
+			"name": "Some Project",
+			"enable": true,
+			"rules": [
+				{"type":"file", 	"value":"http://www.qq.com/test", 		"replace":"D:\\test.txt"},
+				{"type":"file",		"value":"http://www.qq.com/match/*",	"replace":"D:\\test.txt"},
+				{"type":"dir", 		"value":"http://www.qq.com/test/", 		"replace":"D:\\test"},
+				{"type":"combine",	"value":"http://www.qq.com/abc.js",		"replace": [
+					"D:\\combine\\1.js",
+					"D:\\combine\\2.js",
+					"D:\\combine\\3.js"
+				]}
+			]
+		}
+	]
+}

@@ -11,8 +11,14 @@
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			
+			public var facade:RythemFacade;
+			
+			/**
+			 * get the facade singleton instance and start it up
+			 * this is the starting point of the application
+			 */
 			protected function init(event:FlexEvent):void{
-				var facade:RythemFacade = RythemFacade.getInstance();
+				facade = RythemFacade.getInstance();
 				facade.startup(this);
 			}
 			

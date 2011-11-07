@@ -1,6 +1,8 @@
 package com.webpluz.model
 {
 	import com.jo2.filesystem.FileUtils;
+	import com.webpluz.vo.ProjectConfig;
+	import com.webpluz.vo.ReplaceRule;
 	
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -22,6 +24,7 @@ package com.webpluz.model
 		private var localConfig:File;
 		private var remoteConfig:URLLoader;
 		private var loading:Boolean;
+		private var config:Vector.<ProjectConfig>;
 		
 		public function ConfigModel(){
 			super(NAME);
@@ -29,6 +32,7 @@ package com.webpluz.model
 			remoteConfig = new URLLoader();
 			remoteConfig.addEventListener(Event.COMPLETE, onRemoteConfigComplete);
 			remoteConfig.addEventListener(IOErrorEvent.IO_ERROR, onRemoteConfigError);
+			config = new Vector.<ProjectConfig>();
 			trace('[ConfigModel] ready');
 		}
 		
@@ -65,16 +69,39 @@ package com.webpluz.model
 			trace('[ConfigModel] loading remote config');
 		}
 		
+		public function get projects():Vector.<ProjectConfig>{
+			return this.config;
+		}
+		
+		public function matchRule(value:String):ReplaceRule{
+			var result:ReplaceRule;
+			this.config.some(
+				function(project:ProjectConfig, index:uint, all:Vector.<ProjectConfig>):Boolean{
+					if(project.enable){
+						result = project.matchRule(value);
+						return Boolean(result);
+					}
+					else return false;
+				}
+			);
+			return result;
+		}
+		
 		/**
 		 * process raw configuration content (in JSON format)
 		 * @param {String} rawContent raw configuration content
 		 */
 		private function processRawConfigDate(rawContent:String):void{
 			try{
-				var config:Object = JSON.parse(rawContent);
+				var json:Object = JSON.parse(rawContent);
 			}
 			catch(e:Error){
 				trace('[ConfigModel] CONFIG FORMAT ERROR: ' + e.message);
+				return;
+			}
+			var projects:Array = json['projects'];
+			for each(var project:Object in projects){
+				config.push(ProjectConfig.instantiateFromObject(project));
 			}
 		}
 		

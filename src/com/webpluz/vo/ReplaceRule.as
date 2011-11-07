@@ -17,5 +17,9 @@ package com.webpluz.vo
 			this.pattern = pattern;
 			this.replace = replace;
 		}
+		
+		public function toString():String{
+			return '{"type":"' + type + '", "pattern":"' + pattern + '", "replace":"' + replace + '"}';
+		}
 	}
 }

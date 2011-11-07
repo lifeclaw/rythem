@@ -2,7 +2,9 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   width="960" height="600" creationComplete="init(event)" xmlns:view="com.webpluz.view.*">
+					   xmlns:view="com.webpluz.view.*"
+					   xmlns:local="*"
+					   width="960" height="600" creationComplete="init(event)">
 	<fx:Style source="Rythem.css"/>
 	<fx:Script>
 		<![CDATA[
@@ -10,7 +12,8 @@
 			import mx.events.FlexEvent;
 			
 			protected function init(event:FlexEvent):void{
-				
+				var facade:RythemFacade = RythemFacade.getInstance();
+				facade.startup(this);
 			}
 			
 			protected function onSettingButtonClick(event:MouseEvent):void{

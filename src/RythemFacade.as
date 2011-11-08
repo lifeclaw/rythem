@@ -2,6 +2,7 @@ package
 {
 	import com.webpluz.command.*;
 	import com.webpluz.model.*;
+	import com.webpluz.service.ProxyService;
 	import com.webpluz.view.*;
 	
 	import org.puremvc.as3.interfaces.IFacade;
@@ -39,11 +40,12 @@ package
 		override protected function initializeModel():void{
 			super.initializeModel();
 			this.registerProxy(new ConfigModel);
+			this.registerProxy(new ProxyService());
 		}
 		
 		override protected function initializeView():void{
 			super.initializeView();
-			this.registerMediator(new AppMediator(app));
+			//this.registerMediator(new AppMediator(app));//TODO app==null @oscar
 		}
 	}
 }

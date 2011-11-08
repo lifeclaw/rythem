@@ -11,5 +11,12 @@ package com.webpluz.view
 		{
 			super(NAME, viewComponent);
 		}
+		
+		override public function listNotificationInterests():Array{
+			return [];
+		}
+		override public function onRegister( ):void{
+			trace("on register..AppMediator");
+		}
 	}
 }

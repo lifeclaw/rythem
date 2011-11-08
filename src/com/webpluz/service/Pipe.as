@@ -30,10 +30,17 @@ package com.webpluz.service{
 		
 		private var responseContentLength:Number;
 		private var responseChunked:Boolean;
+		private var responseChunkLastLen:Number=0;
+		private var responseChunkLastRead:Number=0;
+		private var responseBodyBuffer:ByteArray;
 
 		
 		private var requestData:RequestData;
 		private var responseData:ResponseData;
+		
+		private var completeEvent:PipeEvent;
+		private var connectEvent:PipeEvent;
+		private var errorEvent:PipeEvent;
 		/*
 		public var responseResult:String;
 		public var responseHeaderString:String;
@@ -44,8 +51,8 @@ package com.webpluz.service{
 		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		private static const NL:RegExp=new RegExp(/\r?\n/);
 
-		
-		private var _indexId:Number;
+		//TODO
+		public var _indexId:Number;
 		public function Pipe(socket:Socket,indexId:Number=0){
 			
 			_ruleManager = RuleManager.getInstance();
@@ -54,6 +61,7 @@ package com.webpluz.service{
 			
 			this.requestBuffer=new ByteArray();
 			this.responseBuffer=new ByteArray();
+			this.responseBodyBuffer = new ByteArray();
 			this.requestHeaderFound=false;
 			this.responseHeaderFound=false;
 			this.responseContentLength=0;
@@ -67,7 +75,7 @@ package com.webpluz.service{
 			if (!this.requestHeaderFound){
 				// Make a string version and check if we've received all the headers yet.
 				var bufferString:String=this.requestBuffer.toString();
-				trace("bufferString=\n" + bufferString);
+				//trace("bufferString=\n" + bufferString);
 				var headerCheck:Number=bufferString.search(SEPERATOR);
 				if (headerCheck != -1){
 					this.requestHeaderFound=true;
@@ -75,6 +83,8 @@ package com.webpluz.service{
 					var headerBodyDivision:Number=headerString.length + 4;
 					requestData = new RequestData(headerString);
 					requestData.body = bufferString.substr(headerBodyDivision);
+					
+					headerString = headerString.replace(/proxy\-connection.*?\r\n/i,"");
 					
 					var matchedRule:Rule = _ruleManager.getRule(requestData.headersObject);
 					if(matchedRule){
@@ -101,16 +111,22 @@ package com.webpluz.service{
 					newRequestBuffer.writeUTFBytes("\r\n\r\n");
 					newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
 					this.requestBuffer=newRequestBuffer;
+					if(this.requestData.port == 443){//
+						this.done();
+					}
 
-
-					this.responseSocket=new Socket();
+					this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
 					//var k:SecureSocket =  new SecureSocket();
 
 					this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
+					//this.responseSocket.addEventListener(ProxySocketEvent.CONNECTED, onResponseSocketConnect);
 					this.responseSocket.addEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
+					//this.responseSocket.addEventListener(ProxySocketEvent.SOCKET_DATA, onResponseSocketData);
 					this.responseSocket.addEventListener(Event.CLOSE, onResponseSocketClose);
 					this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
 					this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
+					this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
+					trace("connecting:",requestData.server, requestData.port);
 					this.responseSocket.connect(requestData.server, requestData.port);
 					/*
 					if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n
@@ -123,6 +139,8 @@ package com.webpluz.service{
 						this.requestSocket.flush();
 					}
 					*/
+					var pipeEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_CONNECTED,this._indexId,this.requestData);
+					this.dispatchEvent(pipeEvent);
 				}
 			}else{
 				if (this.responseSocket.connected){
@@ -136,12 +154,13 @@ package com.webpluz.service{
 
 		private function onResponseSocketIOError(e:IOErrorEvent):void{
 			trace("responseSocketIOError:"+e.errorID, e.type, e.text);
-			var pipeEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_CONNECTED,this._indexId);
-			this.dispatchEvent(pipeEvent);
+			errorEvent = new PipeEvent(PipeEvent.PIPE_ERROR,this._indexId);
+			this.dispatchEvent(errorEvent);
 			this.tearDown();
 		}
 
 		private function onResponseSocketConnect(e:Event):void{
+			
 			this.responseSocket.writeBytes(this.requestBuffer);
 			this.responseSocket.flush();
 			//var _headerEvent:HTTPHeadersEvent = new HTTPHeadersEvent();
@@ -170,39 +189,66 @@ package com.webpluz.service{
 					if(this.responseData.headersObject.hasOwnProperty('content-length')){
 						this.responseContentLength=Number(this.responseData.headersObject['content-length']) + headerString.length + 4;
 					}
-					this.responseData.body = bufferString.substr(headerString.length+4);
-					//this.responseBuffer.clear();
 					//TODO need dispath event when got response header?
 					//this.dispatchEvent(this.headerEvent);
+					
+					this.responseBuffer.position = headerCheck + 4;//TODO error when server return "\n\n" as body's seperator
 				}
 			}
 
 			if (this.responseData && (this.responseData.resultCode == "204" ||  this.responseData.resultCode == "304")){
 				this.done();
 			} else if (this.responseChunked){
-				if (this.isChunkedResponseDone(this.responseBuffer)){
+				// TODO get body to resposneData
+				if (this.readChunckedData(this.responseBuffer)){
+					//trace(this.responseData.body);
+					this.responseData.body = this.responseBodyBuffer.toString();
 					this.done();
 				}
 			} else if (this.responseBuffer.length == this.responseContentLength){
-				
+				// TODO get body to resposneData
+				this.responseData.body+=this.responseBuffer.toString();
+				//trace(this.responseData.body);
 				this.done();
 			}
 		}
 
-		private function isChunkedResponseDone(response:ByteArray):Boolean{
+		private function readChunckedData(response:ByteArray):Boolean{
 			response.position=0;
+			
+			// bug:when buffer has not complete
 			var headerTest:String=new String();
+			var bodyPosition:int = 0;
 			while (response.position < response.length){
 				headerTest+=response.readUTFBytes(1);
-				if (headerTest.search(SEPERATOR) != -1){
+				bodyPosition = headerTest.search(SEPERATOR)
+				if (bodyPosition != -1){
+					bodyPosition += 4
 					break;
 				}
 			}
-
+			responseBodyBuffer.clear();
+			response.readBytes(responseBodyBuffer,response.position);
+			//trace(responseBodyBuffer.toString());
+			
+			response.position = bodyPosition;
+			//trace("++++++++++bodyPosition:"+bodyPosition);
+			
 			var lenString:String="0x";
 			var len:Number=0;
 			var byte:String;
+			/*
+			 * chunked data example:
+			 * \r\nF\r\nthis is content\r\n5\r\nhello\r\n0\r\n\r\n
+			 *
+			 */
+			//var n:int=0;
+			//trace('======response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable); 
 			while (response.position < response.length){
+				//n++;
+				//if(n<20){
+					//trace('response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable);
+				//}
 				byte=response.readUTFBytes(1);
 				if (byte == "\n"){
 					len=parseInt(lenString);
@@ -210,14 +256,12 @@ package com.webpluz.service{
 						return true;
 						break;
 					}else{
-						//TODO 如果buffer不以段为结束，此处会出错..
-						this.responseData.body+=response.readUTFBytes(len);
-						response.position+=(len + 2);
+						response.position+=(len + 2);// TODO:这里不需要判断是\r\n还是\n?
 						lenString="0x";
 						len=0;
+						//trace("body=",responseBodyBuffer.uncompress("gzip"));
 					}
-				}
-				else{
+				}else{
 					lenString+=byte;
 				}
 			}
@@ -225,21 +269,24 @@ package com.webpluz.service{
 		}
 
 		private function onResponseSocketClose(e:Event):void{
+			trace('response close');
 			this.done();
 		}
 
 		private function onRequestSocketClose(e:Event):void{
+			trace('request close');
 			this.done();
 		}
 
 		private function done():void{
 			this.tearDown();
-			var completEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_COMPLETE,this._indexId,this.requestData,this.responseData);
-			this.dispatchEvent(completEvent);
+			completeEvent = new PipeEvent(PipeEvent.PIPE_COMPLETE,this._indexId,this.requestData,this.responseData);
+			this.dispatchEvent(completeEvent);
 		}
 
 		private function testSocket(socket:Socket):Boolean{
 			if (!socket.connected){
+				trace('not connect');
 				this.done();
 				return false;
 			}

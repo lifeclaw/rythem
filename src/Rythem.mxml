@@ -60,6 +60,21 @@
 				<!--- request list -->
 				<s:NavigatorContent label="Requests">
 					<s:List id="requestList" borderVisible="false" width="100%" height="100%"/>
+					<s:DataGrid includeIn="default" left="0" right="0" top="0" bottom="0" id="pipeList"
+								requestedRowCount="4">
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn width="30" dataField="id" headerText="#"></s:GridColumn>
+								<s:GridColumn width="80" dataField="result" headerText="result"></s:GridColumn>
+								<s:GridColumn width="80" dataField="protocol" headerText="protocol"></s:GridColumn>
+								<s:GridColumn width="100" dataField="host" headerText="host"></s:GridColumn>
+								<s:GridColumn width="100" dataField="serverIp" headerText="serverIP"></s:GridColumn>
+								<s:GridColumn dataField="path" headerText="path"></s:GridColumn>
+								<s:GridColumn width="2" dataField="dataField1" headerText="  "
+											  resizable="false" sortable="false"></s:GridColumn>
+							</s:ArrayList>
+						</s:columns>
+					</s:DataGrid>
 				</s:NavigatorContent>
 			</mx:TabNavigator>
 			<mx:TabNavigator width="70%" height="100%" paddingTop="0">

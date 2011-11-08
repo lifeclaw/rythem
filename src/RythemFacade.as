@@ -11,6 +11,8 @@ package
 	{
 		public static const STARTUP:String = 'app.startup';
 		
+		private var app:Rythem;
+		
 		/**
 		 * get an instance of the facade singleton
 		 * DON'T USE CONSTRUCTOR TO INSTANTIATE THE FACADE!
@@ -25,6 +27,7 @@ package
 		 * the STARTUP notification will trigger the StartupCommand
 		 */
 		public function startup(app:Rythem):void{
+			this.app = app;
 			this.sendNotification(STARTUP, app);
 		}
 		
@@ -40,6 +43,7 @@ package
 		
 		override protected function initializeView():void{
 			super.initializeView();
+			this.registerMediator(new AppMediator(app));
 		}
 	}
 }

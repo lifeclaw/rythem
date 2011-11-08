@@ -1,5 +1,4 @@
-package com.webpluz.service
-{
+package com.webpluz.service{
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.ServerSocketConnectEvent;
@@ -7,134 +6,102 @@ package com.webpluz.service
 	import flash.net.ServerSocket;
 	import flash.net.Socket;
 	import flash.net.URLRequestHeader;
-
+	
 	import mx.collections.ArrayCollection;
 
 
+	
+	[Event(name="PIPE_CONNECTED", type="com.webpluz.service.PipeEvent")]
+	[Event(name="PIPE_COMPLETE", type="com.webpluz.service.PipeEvent")]
+	[Event(name="PIPE_ERROR", type="com.webpluz.service.PipeEvent")]
 
-	[Event(name="connect", type="flash.events.ServerSocketConnectEvent")]
-	[Event(name="complete", type="flash.events.Event")]
-
-	public class ProxyService extends EventDispatcher
-	{
+	public class ProxyService extends EventDispatcher{
 		private var _address:String="";
 		private var _port:Number=0;
 		private var _serverSocket:ServerSocket;
 		private var _pipes:Array;
-
-		public function ProxyService(bindAddress:String="", bindPort:Number=0)
-		{
+		private var _pipeCount:int;
+		protected static var _instance:ProxyService=null;
+		public function ProxyService(bindAddress:String="", bindPort:Number=0){
 			super();
+			if(_instance){
+				throw new Error("cannot contruct ProxyService twice!");
+			}
 			this.setupIpAndPort(bindAddress, bindPort);
 			this._serverSocket=new ServerSocket();
 			this._pipes=new Array();
 			this._serverSocket.addEventListener(Event.CONNECT, this.onConnect);
+			_pipeCount = 0;
 		}
-
-		public function listen(bindIp:String="", bindPort:Number=0):Boolean
-		{
+		public static function getInstance(bindAddress:String="", bindPort:Number=0):ProxyService{
+			if(!_instance){
+				_instance = new ProxyService(bindAddress,bindPort);
+			}
+			return _instance;
+		}
+		
+		public function listen(bindIp:String="", bindPort:Number=0):Boolean{
 			this.setupIpAndPort(bindIp, bindPort);
-			if (this._address == "" || this._port == 0)
-			{
+			if (this._address == "" || this._port == 0){
 				throw new Error("fail to listen ip=" + this._address + " and port=" + this._port);
 				return;
 			}
-			if (this._serverSocket.listening)
-			{
-				try
-				{
+			if (this._serverSocket.listening){
+				try{
 					this._serverSocket.close();
-				}
-				catch (e:Error)
-				{
+				}catch (e:Error){
 					//do nothing? 
 				}
 			}
 			this._serverSocket.bind(this._port, this._address);
-			try
-			{
+			try{
 				this._serverSocket.listen();
-			}
-			catch (e:Error)
-			{
+			}catch (e:Error){
 				return false;
 			}
 			return true;
 		}
 
-		public function close():void
-		{
-			if (this._serverSocket.listening)
-			{
-				try
-				{
+		public function close():void{
+			if (this._serverSocket.listening){
+				try{
 					this._serverSocket.close();
-				}
-				catch (e:Error)
-				{
+				}catch (e:Error){
 					//do nothing? 
 				}
 			}
 		}
 
-		public function setupIpAndPort(address:String="", port:Number=0):void
-		{
-			if (address != "")
-			{
+		public function setupIpAndPort(address:String="", port:Number=0):void{
+			if (address != ""){
 				this._address=address;
 			}
-			if (port != 0)
-			{
+			if (port != 0){
 				this._port=port;
 			}
 		}
 
-		private function onConnect(e:ServerSocketConnectEvent):void
-		{
-			var pipe:Pipe=new Pipe(e.socket);
-			pipe.addEventListener(Event.COMPLETE, this.onPipeComplete);
-			pipe.addEventListener(HTTPHeadersEvent.HTTP_HEADERS_EVENT, this.onIncomingHeaders);
+		private function onConnect(e:ServerSocketConnectEvent):void{
+			var pipe:Pipe=new Pipe(e.socket,_pipeCount);
+			_pipeCount++;
+			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
+			pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
+			pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
 			this._pipes.push(pipe);
 		}
-
-		private function onIncomingHeaders(e:HTTPHeadersEvent):void
-		{
-			/*
-			this.output.text += (e.requestSignature + "\n");
-			this.outputHeaders(e.requestHeaders);
-			this.output.text += "\n";
-			this.output.text += (e.responseSignature + "\n");
-			this.outputHeaders(e.responseHeaders);
-			this.output.text += HR;
-			*/
-			/*
-			for(var i:int=0,l:int=e.requestHeaders.length;i<l;++i){
-				trace(e.requestHeaders[i].name +":"+e.requestHeaders[i].value);
-			}*/
-			//trace("========"+e.requestSignature+"==========");
-			/*
-			for(i=0,l=e.responseHeaders.length;i<l;++i){
-				trace(e.responseHeaders[i].name +":"+e.responseHeaders[i].value);
-			}*/
-			//trace("========"+e.responseSignature+"==========");
-			this.dispatchEvent(e.clone() as HTTPHeadersEvent);
+		
+		protected function onPipeError(event:PipeEvent):void{
+			this.dispatchEvent(event);
 		}
-
-		private function outputHeaders(headers:Array):void
-		{
-			for each (var header:URLRequestHeader in headers)
-			{
-				if (header.value == null || header.value.length == 0)
-					continue;
-					//this.output.text += (header.name + ": " + header.value + "\n");
-			}
+		
+		protected function onPipeConnected(event:PipeEvent):void{
+			this.dispatchEvent(event);
 		}
-
-		private function onPipeComplete(e:Event):void
-		{
-			var pipeToRemove:Pipe=e.target as Pipe;
+		
+		private function onPipeComplete(event:PipeEvent):void{
+			var pipeToRemove:Pipe=event.target as Pipe;
 			this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
-			this.dispatchEvent((new ProxyServiceEvent(ProxyServiceEvent.PROXYSERVICEEVENT_COMPLETE, pipeToRemove)));
+			this.dispatchEvent(event);
 		}
 	}
 }

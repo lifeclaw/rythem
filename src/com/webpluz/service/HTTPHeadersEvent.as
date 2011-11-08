@@ -11,9 +11,9 @@ package com.webpluz.service
 		public var requestUrl:String;
 		public var requestPort:Number;
 
-		public var requestHeaders:Array;
+		public var requestHeaders:Object;
 		public var requestSignature:String;
-		public var responseHeaders:Array;
+		public var responseHeaders:Object;
 		public var responseSignature:String;
 
 		public function HTTPHeadersEvent()

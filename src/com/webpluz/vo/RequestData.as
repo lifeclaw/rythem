@@ -11,7 +11,12 @@ package com.webpluz.vo {
 		public var httpVersion:String;
 		public var server:String;
 		private static const NL:RegExp=new RegExp(/\r?\n/);
-		public function RequestData(headerString:String) {
+		public function RequestData(headerString:String="") {
+			if(headerString!=""){
+				this.parseHeader(headerString);
+			}
+		}
+		public function parseHeader(headerString:String):void{
 			this.rawData = headerString;
 			var lines:Array = headerString.split(NL);
 			var initialRequestSignature:String=lines[0];

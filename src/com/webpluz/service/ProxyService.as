@@ -6,6 +6,8 @@ package com.webpluz.service{
 	import flash.net.ServerSocket;
 	import flash.net.Socket;
 	import flash.net.URLRequestHeader;
+	import flash.text.ReturnKeyLabel;
+	import flash.utils.Dictionary;
 	
 	import mx.collections.ArrayCollection;
 	
@@ -26,8 +28,14 @@ package com.webpluz.service{
 		private var _pipes:Array;
 		private var _pipeCount:int;
 		private var _pipeIndexId:Number=0;
+		
+		//TODO move this to a model?
+		private var _pipeDatas:Dictionary;
+		
 		protected static var _instance:ProxyService=null;
 		public static const NAME:String = "PROXYSERVICE";
+		
+		public static const BINDFAIL:String = "ProxyService.BINDFAIL";
 		public function ProxyService(bindAddress:String="", bindPort:Number=0){
 			super();
 			if(_instance){
@@ -36,6 +44,7 @@ package com.webpluz.service{
 			this.setupIpAndPort(bindAddress, bindPort);
 			this._serverSocket=new ServerSocket();
 			this._pipes=new Array();
+			_pipeDatas = new Dictionary();
 			this._serverSocket.addEventListener(Event.CONNECT, this.onConnect);
 			_pipeCount = 0;
 		}
@@ -57,12 +66,14 @@ package com.webpluz.service{
 					this._serverSocket.close();
 				}catch (e:Error){
 					//do nothing? 
+					this.sendNotification(BINDFAIL);
 				}
 			}
 			try{
 				this._serverSocket.bind(this._port, this._address);
 				this._serverSocket.listen();
 			}catch (e:Error){
+				this.sendNotification(BINDFAIL);
 				trace(e.toString());
 				return false;
 			}
@@ -104,16 +115,34 @@ package com.webpluz.service{
 		}
 		
 		protected function onPipeConnected(event:PipeEvent):void{
-			(event.target as Pipe)._indexId = _pipeIndexId;
-			event.pipeId = _pipeIndexId;
+			var pipe:Object = _pipeDatas[event.pipeId] || {};
+			pipe.requestData = event.requestData;
+			_pipeDatas[event.pipeId] = pipe;
 			trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
 			this.dispatchEvent(event);
 			_pipeIndexId++;
 		}
 		
 		private function onPipeComplete(event:PipeEvent):void{
+			var pipe:Object = _pipeDatas[event.pipeId] || {};
+			if(!pipe){
+				//TODO complete without connnect?
+				trace('complet without connect!?????????????????');
+				//return;
+			}
+			pipe.requestData = event.requestData;
+			pipe.responseData = event.responseData;
+			if(!pipe.requestData){
+				
+				trace("...");
+			}
+			_pipeDatas[event.pipeId] = pipe;
 			var pipeToRemove:Pipe=event.target as Pipe;
 			if(event.responseData){
+				trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
+				if(event.responseData){
+					trace(event.responseData.serverIp+" "+event.responseData.resultCode);
+				}
 				//trace("complete:\n"+event.responseData.body);
 			}else{
 				//trace("complete: without response");
@@ -125,7 +154,7 @@ package com.webpluz.service{
 		
 		// define a dispatchEvent for pureMVC
 		public function dispatchEvent(event:PipeEvent):void{
-			//trace("event="+event.type,event.pipeId);
+			trace("event="+event.type,event.pipeId);
 			this.sendNotification(event.type,event);
 		}
 		
@@ -171,7 +200,9 @@ package com.webpluz.service{
 			
 		}
 		
-		
+		public function getPipeDataById(id:Number):Object{
+			return this._pipeDatas[id];
+		}
 		
 		
 	}

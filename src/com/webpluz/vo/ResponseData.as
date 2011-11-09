@@ -9,11 +9,19 @@ package com.webpluz.vo {
 		public var isChuncked:Boolean=false;
 		
 		private static const NL:RegExp=new RegExp(/\r?\n/);
-		public function ResponseData(headerString:String) {
-			rawData = headerString;
+		public var serverIp:String;
+		public function ResponseData(headerString:String="") {
+			if(headerString!=""){
+				this.parseHeader(headerString);
+			}
+			body="";
+			rawData="";
+		}
+		public function parseHeader(headerString:String):void{
 			var headerArray:Array=headerString.split(NL);
 			sig = headerArray.shift();//HTTP/1.1 200 OK
 			resultCode = sig.split(" ")[1];
+			trace(sig+" resultCode:"+resultCode);
 			headersObject = {};
 			for each (var line:String in headerArray){
 				var name:String=line.substring(0, line.indexOf(":"));

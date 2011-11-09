@@ -50,10 +50,9 @@ package com.webpluz.service{
 
 		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		private static const NL:RegExp=new RegExp(/\r?\n/);
-
-		//TODO
-		public var _indexId:Number;
+		private var _indexId:Number;
 		public function Pipe(socket:Socket,indexId:Number=0){
+			
 			
 			_ruleManager = RuleManager.getInstance();
 			_indexId = indexId;
@@ -66,6 +65,8 @@ package com.webpluz.service{
 			this.responseHeaderFound=false;
 			this.responseContentLength=0;
 			this.responseChunked=false;
+			this.requestData = new RequestData();
+			this.responseData = new ResponseData();
 			
 			this.requestSocket.addEventListener(ProgressEvent.SOCKET_DATA, onRequestSocketData);
 			this.requestSocket.addEventListener(Event.CLOSE, onRequestSocketClose);
@@ -115,7 +116,8 @@ package com.webpluz.service{
 						this.done();
 					}
 
-					this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
+					//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
+					this.responseSocket=new Socket();
 					//var k:SecureSocket =  new SecureSocket();
 
 					this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
@@ -174,6 +176,7 @@ package com.webpluz.service{
 			this.responseSocket.readBytes(this.responseBuffer, position, this.responseSocket.bytesAvailable);
 			this.requestSocket.writeBytes(this.responseBuffer, position);
 			this.requestSocket.flush();
+			this.responseData.rawData = this.responseBuffer.toString();
 			if (!this.responseHeaderFound){
 				// Make a string version and check if we've received all the headers yet.
 				var bufferString:String=this.responseBuffer.toString();
@@ -181,7 +184,8 @@ package com.webpluz.service{
 				if (headerCheck != -1){
 					this.responseHeaderFound=true;
 					var headerString:String=bufferString.substring(0, headerCheck);
-					this.responseData = new ResponseData(headerString);
+					this.responseData.parseHeader(headerString);
+					this.responseData.serverIp = this.responseSocket.remoteAddress;
 					if(this.responseData.headersObject['transfer-encoding'] && 
 						this.responseData.headersObject['transfer-encoding'].toString().toLowerCase() == "chunked"){
 						this.responseChunked=true;
@@ -196,7 +200,8 @@ package com.webpluz.service{
 				}
 			}
 
-			if (this.responseData && (this.responseData.resultCode == "204" ||  this.responseData.resultCode == "304")){
+			if (this.responseData.resultCode == "204" ||  this.responseData.resultCode == "304" || this.responseData.resultCode == "302"
+				|| this.responseData.resultCode == "307"){
 				this.done();
 			} else if (this.responseChunked){
 				// TODO get body to resposneData
@@ -209,6 +214,8 @@ package com.webpluz.service{
 				// TODO get body to resposneData
 				this.responseData.body+=this.responseBuffer.toString();
 				//trace(this.responseData.body);
+				this.done();
+			} else if(this.responseContentLength === 0){
 				this.done();
 			}
 		}

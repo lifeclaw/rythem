@@ -59,7 +59,6 @@
 			<mx:TabNavigator width="30%" height="100%" paddingTop="0">
 				<!--- request list -->
 				<s:NavigatorContent label="Requests">
-					<s:List id="requestList" borderVisible="false" width="100%" height="100%"/>
 					<s:DataGrid includeIn="default" left="0" right="0" top="0" bottom="0" id="pipeList"
 								requestedRowCount="4">
 						<s:columns>
@@ -79,12 +78,14 @@
 			</mx:TabNavigator>
 			<mx:TabNavigator width="70%" height="100%" paddingTop="0">
 				<s:NavigatorContent label="Inspector">
-					<mx:VDividedBox width="100%" height="100%">
+					<mx:VDividedBox id="inspectorGroup" width="100%" height="100%">
 						<s:Group width="100%" height="50%">
-							<view:ColorRect fillColor="0xCCCCCC"/>
+							<s:TextArea id="request"
+										width.default="100%" height.default="100%"/>
 						</s:Group>
 						<s:Group width="100%" height="50%">
-							<view:ColorRect fillColor="0xCCCCCC"/>
+							<s:TextArea id="response"
+										width.default="100%" height.default="100%"/>
 						</s:Group>
 					</mx:VDividedBox>
 				</s:NavigatorContent>

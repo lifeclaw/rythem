@@ -50,12 +50,13 @@ package com.webpluz.service{
 
 		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		private static const NL:RegExp=new RegExp(/\r?\n/);
+		private static var id:Number=0;
 		private var _indexId:Number;
 		public function Pipe(socket:Socket,indexId:Number=0){
 			
 			
 			_ruleManager = RuleManager.getInstance();
-			_indexId = indexId;
+			_indexId = id++;
 			this.requestSocket=socket;
 			
 			this.requestBuffer=new ByteArray();
@@ -106,7 +107,10 @@ package com.webpluz.service{
 							requestData.server = (matchedRule as IpReplaceRule).getIpToChange();
 						}
 					}
-					// Replace the header in the buffer with our new and improved header.
+					var newHeaderSignature:String = this.requestData.method + " " + this.requestData.path + " " + this.requestData.httpVersion + "\r\n";
+					
+					// Replace the old request signature with the new one.
+					headerString = headerString.replace(/^.*?\r\n/, newHeaderSignature);
 					var newRequestBuffer:ByteArray=new ByteArray();
 					newRequestBuffer.writeUTFBytes(headerString);
 					newRequestBuffer.writeUTFBytes("\r\n\r\n");
@@ -116,8 +120,8 @@ package com.webpluz.service{
 						this.done();
 					}
 
-					//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
-					this.responseSocket=new Socket();
+					this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
+					//this.responseSocket=new Socket();
 					//var k:SecureSocket =  new SecureSocket();
 
 					this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);

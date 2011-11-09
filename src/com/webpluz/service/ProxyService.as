@@ -101,8 +101,8 @@ package com.webpluz.service{
 		}
 
 		private function onConnect(e:ServerSocketConnectEvent):void{
-			var pipe:Pipe=new Pipe(e.socket,_pipeCount);
-			_pipeCount++;
+			var pipe:Pipe=new Pipe(e.socket,_pipeCount++);
+			//_pipeCount++;
 			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 			pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
 			pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);

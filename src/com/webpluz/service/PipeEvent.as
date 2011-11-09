@@ -20,5 +20,9 @@ package com.webpluz.service
 			this.requestData = requestData;
 			this.responseData = responseData;
 		}
+		public override function clone():Event{
+			var e:PipeEvent = new PipeEvent(this.type,this.pipeId,this.requestData,this.responseData);
+			return e;
+		}
 	}
 }

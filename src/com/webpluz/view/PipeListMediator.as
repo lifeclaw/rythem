@@ -76,10 +76,10 @@ package com.webpluz.view{
 					};
 					viewDataIndexMapping[dataIndex] = item;
 					pipeList.addItem(item);
-					trace("PIPE_CONNECTED:"+dataIndex);
+					//trace("PIPE_CONNECTED:"+dataIndex);
 					break;
 				case PipeEvent.PIPE_COMPLETE:
-					trace("PIPE_COMPLETE:"+dataIndex);
+					//trace("PIPE_COMPLETE:"+dataIndex);
 					item = viewDataIndexMapping[dataIndex];
 					//var item:Object = pipeList.getItemAt(indexId);
 					if(!item || !resData)break;
@@ -98,7 +98,7 @@ package com.webpluz.view{
 			}
 		}
 		override public function onRegister( ):void{
-			trace('onRegister-------- ');
+			//trace('onRegister-------- ');
 		}
 	}
 }

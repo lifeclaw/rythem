@@ -132,7 +132,7 @@ package com.webpluz.service{
 					this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
 					this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
 					this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
-					trace("connecting:",requestData.server, requestData.port);
+					//trace("connecting:",requestData.server, requestData.port);
 					this.responseSocket.connect(requestData.server, requestData.port);
 					/*
 					if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n

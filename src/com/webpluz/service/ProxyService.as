@@ -27,7 +27,6 @@ package com.webpluz.service{
 		private var _serverSocket:ServerSocket;
 		private var _pipes:Array;
 		private var _pipeCount:int;
-		private var _pipeIndexId:Number=0;
 		
 		//TODO move this to a model?
 		private var _pipeDatas:Dictionary;
@@ -110,51 +109,39 @@ package com.webpluz.service{
 		}
 		
 		protected function onPipeError(event:PipeEvent):void{
-			trace("event="+event.type,event.pipeId);
-			this.dispatchEvent(event);
+			//trace("event="+event.type,event.pipeId);
+			this.dispatchEvent(event.clone());
 		}
 		
 		protected function onPipeConnected(event:PipeEvent):void{
-			var pipe:Object = _pipeDatas[event.pipeId] || {};
-			pipe.requestData = event.requestData;
-			_pipeDatas[event.pipeId] = pipe;
-			trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
-			this.dispatchEvent(event);
-			_pipeIndexId++;
+			var e2:PipeEvent = (event.clone() as PipeEvent);
+			this.storePipe(e2);
+			//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
+			this.dispatchEvent(e2);
 		}
 		
 		private function onPipeComplete(event:PipeEvent):void{
-			var pipe:Object = _pipeDatas[event.pipeId] || {};
-			if(!pipe){
-				//TODO complete without connnect?
-				trace('complet without connect!?????????????????');
-				//return;
-			}
-			pipe.requestData = event.requestData;
-			pipe.responseData = event.responseData;
-			if(!pipe.requestData){
-				
-				trace("...");
-			}
-			_pipeDatas[event.pipeId] = pipe;
+			var e2:PipeEvent = (event.clone() as PipeEvent);
+			this.storePipe(e2);
 			var pipeToRemove:Pipe=event.target as Pipe;
 			if(event.responseData){
-				trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
+				//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
 				if(event.responseData){
-					trace(event.responseData.serverIp+" "+event.responseData.resultCode);
+					//trace(event.responseData.serverIp+" "+event.responseData.resultCode);
 				}
 				//trace("complete:\n"+event.responseData.body);
 			}else{
 				//trace("complete: without response");
 			}
 			this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
-			this.dispatchEvent(event);
+			this.dispatchEvent(e2);
 		}
 		
 		
 		// define a dispatchEvent for pureMVC
-		public function dispatchEvent(event:PipeEvent):void{
-			trace("event="+event.type,event.pipeId);
+		public function dispatchEvent(e:Event):void{
+			var event:PipeEvent = e as PipeEvent;
+			//trace("event="+event.type,event.pipeId);
 			this.sendNotification(event.type,event);
 		}
 		
@@ -201,9 +188,19 @@ package com.webpluz.service{
 		}
 		
 		public function getPipeDataById(id:Number):Object{
-			return this._pipeDatas[id];
+			return this._pipeDatas[""+id];
 		}
-		
+		private function storePipe(event:PipeEvent):void{
+			trace("====stroePipe:["+event.requestData+"] ["+event.responseData+"] "+" ["+event.pipeId+"] ");
+			var pipe:Object = _pipeDatas[""+event.pipeId] || {};
+			if(event.requestData){
+				pipe.requestData = event.requestData;
+			}
+			if(event.responseData){
+				pipe.responseData = event.responseData;
+			}
+			_pipeDatas[""+event.pipeId] = pipe;
+		}
 		
 	}
 }

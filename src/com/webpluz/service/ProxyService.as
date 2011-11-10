@@ -93,6 +93,14 @@ package com.webpluz.service{
 					//do nothing? 
 				}
 			}
+			for each(var s:Socket in this._waitingSockets){
+				try{
+					s.close();
+				}catch(e:Error){}
+			}
+			for each(var p:Pipe in this._pipes){
+				p.tearDown();
+			}
 		}
 
 		public function setupIpAndPort(address:String="", port:Number=0):void{
@@ -105,7 +113,7 @@ package com.webpluz.service{
 		}
 		
 		private function generateConnecttion():void{
-			while(this._pipes.length <10){
+			while(true || this._pipes.length <2){//TODO 
 				if(this._waitingSockets.length==0){
 					break;
 				}
@@ -117,7 +125,7 @@ package com.webpluz.service{
 				this._pipes.push(pipe);
 				trace("socket connections:"+this._pipes.length);
 			}
-			trace("generateConnection end");
+			trace("generateConnection end"+this._pipes.length+"  "+this._waitingSockets.length);
 		}
 		private function onConnect(e:ServerSocketConnectEvent):void{
 			//if(this._pipes.length >=10){
@@ -141,7 +149,10 @@ package com.webpluz.service{
 			if(this.storePipe(e2)){
 				trace("remove pipe when CONNECT "+e2.pipeId);
 				var pipeToRemove:Pipe=event.target as Pipe;
+				trace("onPipeConnected before remove:"+this._pipes.length);
 				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+				trace("onPipeConnected after remove:"+this._pipes.length);
+				this.generateConnecttion();
 			}
 			//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
 			//this.dispatchEvent(e2);
@@ -152,11 +163,13 @@ package com.webpluz.service{
 			var e2:PipeEvent = (event.clone() as PipeEvent);
 			if(this.storePipe(e2)){
 				var pipeToRemove:Pipe=event.target as Pipe;
+				trace("before remove:"+this._pipes.length);
 				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+				trace("after remove:"+this._pipes.length);
+				this.generateConnecttion();
 			}
 			//this.dispatchEvent(e2);
 			this.sendNotification(event.type,this.getPipeDataById(event.pipeId));
-			this.generateConnecttion();
 		}
 		
 		

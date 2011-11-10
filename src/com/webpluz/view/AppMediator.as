@@ -1,5 +1,9 @@
 package com.webpluz.view
 {
+	import com.webpluz.service.ProxyService;
+	
+	import flash.events.Event;
+	
 	import org.puremvc.as3.interfaces.IMediator;
 	import org.puremvc.as3.patterns.mediator.Mediator;
 	
@@ -10,6 +14,14 @@ package com.webpluz.view
 		public function AppMediator(viewComponent:Object)
 		{
 			super(NAME, viewComponent);
+			var app:Rythem = viewComponent as Rythem;
+			app.addEventListener(Event.CLOSE,onWindowClose);
+		}
+		
+		protected function onWindowClose(event:Event):void
+		{
+			trace("window close");
+			(facade.retrieveProxy(ProxyService.NAME) as ProxyService).close();
 		}
 		
 		override public function listNotificationInterests():Array{

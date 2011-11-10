@@ -121,8 +121,8 @@ package com.webpluz.service{
 						this.done();
 					}
 
-					this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
-					//this.responseSocket=new Socket();
+					//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
+					this.responseSocket=new Socket();
 					//var k:SecureSocket =  new SecureSocket();
 
 					this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);

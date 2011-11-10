@@ -1,5 +1,5 @@
 package com.webpluz.vo {
-
+	
 	public class ResponseData {
 		public var sig:String;
 		public var headersObject:Object;
@@ -21,7 +21,7 @@ package com.webpluz.vo {
 			var headerArray:Array=headerString.split(NL);
 			sig = headerArray.shift();//HTTP/1.1 200 OK
 			resultCode = sig.split(" ")[1];
-			trace(sig+" resultCode:"+resultCode);
+			//trace(sig+" resultCode:"+resultCode);
 			headersObject = {};
 			for each (var line:String in headerArray){
 				var name:String=line.substring(0, line.indexOf(":"));

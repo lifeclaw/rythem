@@ -50,7 +50,7 @@ package com.webpluz.view{
 		protected function onGripdClick(event:Event):void{
 			var g:DataGrid = event.target as DataGrid;
 			var item:Object = g.selectedItem;
-			this.sendNotification(PipeListMediator.ListSelectChanged,item['id']);
+			this.sendNotification(PipeListMediator.ListSelectChanged,item['pipeId']);
 		}
 		override public function listNotificationInterests():Array{
 			var a:Array = [PipeEvent.PIPE_COMPLETE,PipeEvent.PIPE_CONNECTED,PipeEvent.PIPE_ERROR];
@@ -59,16 +59,21 @@ package com.webpluz.view{
 		override public function handleNotification( notification:INotification ):void{
 			//return;
 			var t:String = notification.getName();
-			var orientEvent:PipeEvent = notification.getBody() as PipeEvent;
-			var reqData:RequestData = orientEvent.requestData;
-			var resData:ResponseData = orientEvent.responseData;
-			var dataIndex:Number = orientEvent.pipeId;
+//			var orientEvent:PipeEvent = notification.getBody() as PipeEvent;
+//			var reqData:RequestData = orientEvent.requestData;
+//			var resData:ResponseData = orientEvent.responseData;
+//			var dataIndex:Number = orientEvent.pipeId;
+			var pipeData:Object = notification.getBody();			
+			var reqData:RequestData = pipeData.requestData;
+			var resData:ResponseData = pipeData.responseData;
+			var dataIndex:Number = pipeData.pipeId;
 			var item:Object;
 			
 			switch(t){
 				case PipeEvent.PIPE_CONNECTED:
 					var listIndex:int = pipeList.length;
 					item={
+						"pipeId":pipeData.pipeId,
 						"id":listIndex,
 						"protocol":reqData.httpVersion,
 						"host":reqData.server,
@@ -93,7 +98,7 @@ package com.webpluz.view{
 					item = viewDataIndexMapping[dataIndex];
 					if(!item)break;
 					item['result']="err";
-					pipeList.itemUpdated(item);
+					//pipeList.itemUpdated(item);
 					break;
 			}
 		}

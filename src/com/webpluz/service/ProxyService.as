@@ -1,4 +1,7 @@
 package com.webpluz.service{
+	import com.webpluz.vo.RequestData;
+	import com.webpluz.vo.ResponseData;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.ServerSocketConnectEvent;
@@ -27,6 +30,7 @@ package com.webpluz.service{
 		private var _serverSocket:ServerSocket;
 		private var _pipes:Array;
 		private var _pipeCount:int;
+		private var _waitingSockets:Array;
 		
 		//TODO move this to a model?
 		private var _pipeDatas:Dictionary;
@@ -43,6 +47,7 @@ package com.webpluz.service{
 			this.setupIpAndPort(bindAddress, bindPort);
 			this._serverSocket=new ServerSocket();
 			this._pipes=new Array();
+			this._waitingSockets = new Array();
 			_pipeDatas = new Dictionary();
 			this._serverSocket.addEventListener(Event.CONNECT, this.onConnect);
 			_pipeCount = 0;
@@ -98,43 +103,59 @@ package com.webpluz.service{
 				this._port=port;
 			}
 		}
-
+		
+		private function generateConnecttion():void{
+			while(this._pipes.length <10){
+				if(this._waitingSockets.length==0){
+					return;
+				}
+				var pipe:Pipe=new Pipe((this._waitingSockets.shift() as Socket),_pipeCount++);
+				//_pipeCount++;
+				pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
+				pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
+				pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
+				this._pipes.push(pipe);
+				trace("socket connections:"+this._pipes.length);
+			}
+		}
 		private function onConnect(e:ServerSocketConnectEvent):void{
-			var pipe:Pipe=new Pipe(e.socket,_pipeCount++);
-			//_pipeCount++;
-			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
-			pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
-			pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
-			this._pipes.push(pipe);
+			//if(this._pipes.length >=10){
+			this._waitingSockets.push(e.socket);
+			//	return;
+			//}
+			this.generateConnecttion();
 		}
 		
 		protected function onPipeError(event:PipeEvent):void{
 			//trace("event="+event.type,event.pipeId);
-			this.dispatchEvent(event.clone());
+			//this.dispatchEvent(event.clone());
+			var pipeToRemove:Pipe=event.target as Pipe;
+			this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+			this.sendNotification(event.type,this.getPipeDataById(event.pipeId));
+			this.generateConnecttion();
 		}
 		
 		protected function onPipeConnected(event:PipeEvent):void{
 			var e2:PipeEvent = (event.clone() as PipeEvent);
-			this.storePipe(e2);
+			if(this.storePipe(e2)){
+				trace("remove pipe when CONNECT "+e2.pipeId);
+				var pipeToRemove:Pipe=event.target as Pipe;
+				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+			}
 			//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
-			this.dispatchEvent(e2);
+			//this.dispatchEvent(e2);
+			this.sendNotification(event.type,this.getPipeDataById(event.pipeId));
 		}
 		
 		private function onPipeComplete(event:PipeEvent):void{
 			var e2:PipeEvent = (event.clone() as PipeEvent);
-			this.storePipe(e2);
-			var pipeToRemove:Pipe=event.target as Pipe;
-			if(event.responseData){
-				//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
-				if(event.responseData){
-					//trace(event.responseData.serverIp+" "+event.responseData.resultCode);
-				}
-				//trace("complete:\n"+event.responseData.body);
-			}else{
-				//trace("complete: without response");
+			if(this.storePipe(e2)){
+				var pipeToRemove:Pipe=event.target as Pipe;
+				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
 			}
-			this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
-			this.dispatchEvent(e2);
+			//this.dispatchEvent(e2);
+			this.sendNotification(event.type,this.getPipeDataById(event.pipeId));
+			this.generateConnecttion();
 		}
 		
 		
@@ -188,18 +209,33 @@ package com.webpluz.service{
 		}
 		
 		public function getPipeDataById(id:Number):Object{
-			return this._pipeDatas[""+id];
+			var o:Object = this._pipeDatas["-"+id];
+			//trace("getting by id="+id+" "+(o?" exists":" NODATA"));
+			return o;
 		}
-		private function storePipe(event:PipeEvent):void{
-			trace("====stroePipe:["+event.requestData+"] ["+event.responseData+"] "+" ["+event.pipeId+"] ");
-			var pipe:Object = _pipeDatas[""+event.pipeId] || {};
-			if(event.requestData){
-				pipe.requestData = event.requestData;
+		private function storePipe(event:PipeEvent):Boolean{
+			trace("====stroePipe:"+event.type+" ["+event.requestData+"] ["+event.responseData+"] "+" ["+event.pipeId+"] ");
+			var pipeDataExists:Boolean = true;
+			var pipe:Object = getPipeDataById(event.pipeId);
+			if(!pipe){
+				pipe = {};
+				pipeDataExists = false;
 			}
-			if(event.responseData){
-				pipe.responseData = event.responseData;
+			var req:RequestData = event.requestData;
+			var res:ResponseData = event.responseData;
+			if(req && req.rawData){
+				pipe.requestData = req;
+				//req.update(event.requestData);
 			}
-			_pipeDatas[""+event.pipeId] = pipe;
+			if(res && res.rawData){
+				pipe.responseData = res;
+				//res.update(event.responseData);
+			}
+			pipe['pipeId'] = event.pipeId;
+			_pipeDatas["-"+event.pipeId] = pipe;
+			trace("====stroePipe END:"+event.type+" ["+pipe.requestData+"] ["+pipe.responseData+"] "+" ["+pipe.pipeId+"] ");
+			
+			return pipeDataExists;
 		}
 		
 	}

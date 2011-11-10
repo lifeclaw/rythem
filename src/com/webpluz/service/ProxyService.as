@@ -107,7 +107,7 @@ package com.webpluz.service{
 		private function generateConnecttion():void{
 			while(this._pipes.length <10){
 				if(this._waitingSockets.length==0){
-					return;
+					break;
 				}
 				var pipe:Pipe=new Pipe((this._waitingSockets.shift() as Socket),_pipeCount++);
 				//_pipeCount++;
@@ -117,6 +117,7 @@ package com.webpluz.service{
 				this._pipes.push(pipe);
 				trace("socket connections:"+this._pipes.length);
 			}
+			trace("generateConnection end");
 		}
 		private function onConnect(e:ServerSocketConnectEvent):void{
 			//if(this._pipes.length >=10){

@@ -11,7 +11,7 @@ package com.webpluz.command
 	{
 		override public function execute(notification:INotification):void{
 			(facade.retrieveProxy(ConfigModel.NAME) as ConfigModel).reload();
-			(facade.retrieveProxy(ProxyService.NAME) as ProxyService).listen("127.0.0.1",8848);
+			(facade.retrieveProxy(ProxyService.NAME) as ProxyService).listen("127.0.0.1",8080);
 		}
 	}
 }

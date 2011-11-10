@@ -81,7 +81,7 @@ package com.webpluz.view{
 					};
 					viewDataIndexMapping[dataIndex] = item;
 					pipeList.addItem(item);
-					//trace("PIPE_CONNECTED:"+dataIndex);
+					trace("PIPE_CONNECTED:"+listIndex+" dataIndex:"+dataIndex);
 					break;
 				case PipeEvent.PIPE_COMPLETE:
 					//trace("PIPE_COMPLETE:"+dataIndex);
@@ -98,7 +98,7 @@ package com.webpluz.view{
 					item = viewDataIndexMapping[dataIndex];
 					if(!item)break;
 					item['result']="err";
-					//pipeList.itemUpdated(item);
+					pipeList.itemUpdated(item);
 					break;
 			}
 		}

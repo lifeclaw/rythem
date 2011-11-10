@@ -115,6 +115,7 @@ package com.webpluz.service{
 					newRequestBuffer.writeUTFBytes(headerString);
 					newRequestBuffer.writeUTFBytes("\r\n\r\n");
 					newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
+					trace(newRequestBuffer.toString());
 					this.requestBuffer=newRequestBuffer;
 					if(this.requestData.port == 443){//
 						this.done();
@@ -147,13 +148,19 @@ package com.webpluz.service{
 					*/
 					var pipeEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_CONNECTED,this._indexId,this.requestData);
 					this.dispatchEvent(pipeEvent);
+					trace("header "+this._indexId+"  \n"+this.requestBuffer.toString());
+				}else{
+					trace("no header "+this._indexId);
 				}
 			}else{
 				if (this.responseSocket.connected){
+					trace("has header, and responseSocket connected"+this._indexId);
 					requestData.body += this.requestBuffer.toString();
 					this.responseSocket.writeBytes(this.requestBuffer);
 					this.responseSocket.flush();
 					this.requestBuffer.clear();
+				}else{
+					trace("has header, but responseSocket NOCONNECT"+this._indexId);
 				}
 			}
 		}
@@ -166,7 +173,7 @@ package com.webpluz.service{
 		}
 
 		private function onResponseSocketConnect(e:Event):void{
-			
+			trace("onResponseSocketCOnnect"+this._indexId);
 			this.responseSocket.writeBytes(this.requestBuffer);
 			this.responseSocket.flush();
 			//var _headerEvent:HTTPHeadersEvent = new HTTPHeadersEvent();
@@ -222,6 +229,7 @@ package com.webpluz.service{
 			} else if(this.responseContentLength === 0){
 				this.done();
 			}
+			trace("response data.."+this._indexId+" got header?"+(responseHeaderFound?"YES":this.responseBuffer.toString()));
 		}
 
 		private function readChunckedData(response:ByteArray):Boolean{
@@ -230,7 +238,12 @@ package com.webpluz.service{
 			// bug:when buffer has not complete
 			var headerTest:String=new String();
 			var bodyPosition:int = 0;
+			var m:int=0;
 			while (response.position < response.length){
+				m++;
+				if(m>200){
+					trace("1 too long:m="+m);
+				}
 				headerTest+=response.readUTFBytes(1);
 				bodyPosition = headerTest.search(SEPERATOR)
 				if (bodyPosition != -1){
@@ -253,13 +266,14 @@ package com.webpluz.service{
 			 * \r\nF\r\nthis is content\r\n5\r\nhello\r\n0\r\n\r\n
 			 *
 			 */
-			//var n:int=0;
+			var n:int=0;
 			//trace('======response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable); 
 			while (response.position < response.length){
-				//n++;
-				//if(n<20){
+				n++;
+				if(n>200){
+					trace("tooooooooooooo long..");
 					//trace('response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable);
-				//}
+				}
 				byte=response.readUTFBytes(1);
 				if (byte == "\n"){
 					len=parseInt(lenString);

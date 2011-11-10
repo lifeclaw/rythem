@@ -132,7 +132,7 @@ package com.webpluz.service{
 					this.responseSocket.addEventListener(Event.CLOSE, onResponseSocketClose);
 					this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
 					this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
-					this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
+					//this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
 					//trace("connecting:",requestData.server, requestData.port);
 					this.responseSocket.connect(requestData.server, requestData.port);
 					/*

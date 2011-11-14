@@ -83,7 +83,9 @@ package com.webpluz.service{
 					this.requestHeaderFound=true;
 					var headerString:String=bufferString.substring(0, headerCheck);
 					var headerBodyDivision:Number=headerString.length + 4;
+					var serverToConnect:String;
 					requestData = new RequestData(headerString);
+					serverToConnect = requestData.server;
 					requestData.body = bufferString.substr(headerBodyDivision);
 					
 					headerString = headerString.replace(/proxy\-connection.*?\r\n/i,"");
@@ -104,7 +106,7 @@ package com.webpluz.service{
 									break;
 							}
 						}else{
-							requestData.server = (matchedRule as IpReplaceRule).getIpToChange();
+							serverToConnect = (matchedRule as IpReplaceRule).getIpToChange();
 						}
 					}
 					var newHeaderSignature:String = this.requestData.method + " " + this.requestData.path + " " + this.requestData.httpVersion + "\r\n";
@@ -134,7 +136,7 @@ package com.webpluz.service{
 					this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
 					//this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
 					//trace("connecting:",requestData.server, requestData.port);
-					this.responseSocket.connect(requestData.server, requestData.port);
+					this.responseSocket.connect(serverToConnect, requestData.port);
 					/*
 					if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n
 						//HTTP/1.1 200 Connection established

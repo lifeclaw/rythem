@@ -45,7 +45,6 @@ package
 		
 		override protected function initializeView():void{
 			super.initializeView();
-			//this.registerMediator(new AppMediator(app));//TODO app==null @oscar
 		}
 	}
 }

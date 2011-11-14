@@ -8,8 +8,8 @@ package com.webpluz.service{
 			this.ipToChange = ip;
 		}
 		public override function isMatch(headers:Object):Boolean{
-			var host:String = headers['Host'];
-			return (host.toLocaleLowerCase() == this.hostName);
+			var host:String = headers['host'];
+			return (host && host.toLocaleLowerCase() == this.hostName);
 		}
 		public function getIpToChange():String{
 			return this.ipToChange;

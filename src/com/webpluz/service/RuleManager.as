@@ -1,5 +1,7 @@
 package com.webpluz.service{
-	public class RuleManager{
+	import flash.utils.Proxy;
+
+	public class RuleManager extends Proxy{
 		protected static var instance:RuleManager=null;
 		private var rulesLow:Array;
 		private var rulesNormal:Array;
@@ -11,6 +13,21 @@ package com.webpluz.service{
 			rulesLow = new Array();
 			rulesNormal = new Array();
 			rulesHigh = new Array();
+			instance = this;
+			
+			rulesLow.push(new IpReplaceRule("web2.qq.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("0.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("1.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("2.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("3.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("4.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("5.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("6.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("7.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("8.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("9.web.qstatic.com","113.108.4.143"));
+			rulesLow.push(new IpReplaceRule("cgi.web2.qq.com","113.108.4.143"));
 		}
 		public function addRule(r:Rule):void{
 			switch(r.getPriority()){

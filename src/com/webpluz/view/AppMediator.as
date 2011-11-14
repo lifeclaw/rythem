@@ -1,5 +1,6 @@
 package com.webpluz.view
 {
+	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfig;
 	import com.jo2.system.ProxyManager;
 	import com.webpluz.service.ProxyService;
@@ -31,7 +32,8 @@ package com.webpluz.view
 			(facade.retrieveProxy(ProxyService.NAME) as ProxyService).close();
 			//restore proxy configurations
 			var config:ProxyConfig = new ProxyConfig(null, 'http://txp-01.tencent.com/lvsproxy.pac');
-			ProxyManager.getProxyManager().proxy = config;
+			var pm:IProxyManager = ProxyManager.getProxyManager();
+			if(pm) pm.proxy = config;
 		}
 		
 		protected function onAppClosing(e:Event):void{

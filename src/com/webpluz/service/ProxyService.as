@@ -1,5 +1,6 @@
 package com.webpluz.service{
 	import com.jo2.net.URI;
+	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfig;
 	import com.jo2.system.ProxyManager;
 	import com.webpluz.vo.RequestData;
@@ -89,7 +90,8 @@ package com.webpluz.service{
 			//automaticlly set system proxy to this proxy service
 			var proxyServer:URI = new URI(_address + ':' + _port);
 			var configs:ProxyConfig = new ProxyConfig(proxyServer);
-			ProxyManager.getProxyManager().proxy = configs;
+			var pm:IProxyManager = ProxyManager.getProxyManager();
+			if(pm) pm.proxy = configs;
 			
 			return true;
 		}

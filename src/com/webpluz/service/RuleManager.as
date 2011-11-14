@@ -1,4 +1,7 @@
 package com.webpluz.service{
+	import com.webpluz.vo.RequestData;
+	
+	import flash.system.Capabilities;
 	import flash.utils.Proxy;
 
 	public class RuleManager extends Proxy{
@@ -28,6 +31,11 @@ package com.webpluz.service{
 			rulesLow.push(new IpReplaceRule("8.web.qstatic.com","113.108.4.143"));
 			rulesLow.push(new IpReplaceRule("9.web.qstatic.com","113.108.4.143"));
 			rulesLow.push(new IpReplaceRule("cgi.web2.qq.com","113.108.4.143"));
+			if(Capabilities.os.indexOf("Windows")!=-1){
+				rulesLow.push(new ContentReplaceRule("http://iptton.com/","E:/rythemReplace/test.html"));
+			}else{
+				rulesLow.push(new ContentReplaceRule("http://iptton.com/","./rythemReplace/test.html"));
+			}
 		}
 		public function addRule(r:Rule):void{
 			switch(r.getPriority()){
@@ -43,19 +51,19 @@ package com.webpluz.service{
 					break;
 			}
 		}
-		public function getRule(headers:Object):Rule{
+		public function getRule(requestData:RequestData):Rule{
 			for each(var r:Rule in rulesHigh){
-				if(r.isMatch(headers)){
+				if(r.isMatch(requestData)){
 					return r;
 				}
 			}
 			for each(r in rulesNormal){
-				if(r.isMatch(headers)){
+				if(r.isMatch(requestData)){
 					return r;
 				}
 			}
 			for each(r in rulesLow){
-				if(r.isMatch(headers)){
+				if(r.isMatch(requestData)){
 					return r;
 				}
 			}

@@ -90,7 +90,11 @@ package com.webpluz.service{
 					
 					headerString = headerString.replace(/proxy\-connection.*?\r\n/i,"");
 					
-					var matchedRule:Rule = _ruleManager.getRule(requestData.headersObject);
+					
+					var pipeEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_CONNECTED,this._indexId,this.requestData);
+					this.dispatchEvent(pipeEvent);
+					
+					var matchedRule:Rule = _ruleManager.getRule(requestData);
 					if(matchedRule){
 						var ruleType:String = matchedRule.getType();
 						if(ruleType!=Rule.RULE_TYPE_REPLACE_IP){
@@ -100,6 +104,14 @@ package com.webpluz.service{
 								case Rule.RULE_TYPE_DICTORY:
 									break;
 								case Rule.RULE_TYPE_REPLACE_SINGLE_CONTENT:
+									var autoResponse:String = (matchedRule as ContentReplaceRule).getContent();
+									var headerAndBody:Array = autoResponse.split("\r\n\r\n");
+									this.responseData.parseHeader(headerAndBody[0]);
+									this.responseData.rawData = autoResponse;
+									this.responseData.body = headerAndBody[1];
+									this.requestSocket.writeUTFBytes(autoResponse);
+									this.done();
+									return;
 									break;
 								default:
 									throw new Error("cannot handle this rule!");
@@ -108,48 +120,47 @@ package com.webpluz.service{
 						}else{
 							serverToConnect = (matchedRule as IpReplaceRule).getIpToChange();
 						}
+					}else{
+						var newHeaderSignature:String = this.requestData.method + " " + this.requestData.path + " " + this.requestData.httpVersion + "\r\n";
+						
+						// Replace the old request signature with the new one.
+						headerString = headerString.replace(/^.*?\r\n/, newHeaderSignature);
+						var newRequestBuffer:ByteArray=new ByteArray();
+						newRequestBuffer.writeUTFBytes(headerString);
+						newRequestBuffer.writeUTFBytes("\r\n\r\n");
+						newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
+						trace(newRequestBuffer.toString());
+						this.requestBuffer=newRequestBuffer;
+						if(this.requestData.port == 443){//
+							this.done();
+						}
+	
+						//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
+						this.responseSocket=new Socket();
+						//var k:SecureSocket =  new SecureSocket();
+	
+						this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
+						//this.responseSocket.addEventListener(ProxySocketEvent.CONNECTED, onResponseSocketConnect);
+						this.responseSocket.addEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
+						//this.responseSocket.addEventListener(ProxySocketEvent.SOCKET_DATA, onResponseSocketData);
+						this.responseSocket.addEventListener(Event.CLOSE, onResponseSocketClose);
+						this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
+						this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
+						//this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
+						//trace("connecting:",requestData.server, requestData.port);
+						this.responseSocket.connect(serverToConnect, requestData.port);
+						/*
+						if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n
+							//HTTP/1.1 200 Connection established
+							trace("secureSocket---------------");
+	
+							var responseBuffer:ByteArray=new ByteArray();
+							responseBuffer.writeUTFBytes("HTTP/1.1 200 Connection established\r\n\r\n");
+							this.requestSocket.writeBytes(responseBuffer);
+							this.requestSocket.flush();
+						}
+						*/
 					}
-					var newHeaderSignature:String = this.requestData.method + " " + this.requestData.path + " " + this.requestData.httpVersion + "\r\n";
-					
-					// Replace the old request signature with the new one.
-					headerString = headerString.replace(/^.*?\r\n/, newHeaderSignature);
-					var newRequestBuffer:ByteArray=new ByteArray();
-					newRequestBuffer.writeUTFBytes(headerString);
-					newRequestBuffer.writeUTFBytes("\r\n\r\n");
-					newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
-					trace(newRequestBuffer.toString());
-					this.requestBuffer=newRequestBuffer;
-					if(this.requestData.port == 443){//
-						this.done();
-					}
-
-					//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
-					this.responseSocket=new Socket();
-					//var k:SecureSocket =  new SecureSocket();
-
-					this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
-					//this.responseSocket.addEventListener(ProxySocketEvent.CONNECTED, onResponseSocketConnect);
-					this.responseSocket.addEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
-					//this.responseSocket.addEventListener(ProxySocketEvent.SOCKET_DATA, onResponseSocketData);
-					this.responseSocket.addEventListener(Event.CLOSE, onResponseSocketClose);
-					this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
-					this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
-					//this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
-					//trace("connecting:",requestData.server, requestData.port);
-					this.responseSocket.connect(serverToConnect, requestData.port);
-					/*
-					if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n
-						//HTTP/1.1 200 Connection established
-						trace("secureSocket---------------");
-
-						var responseBuffer:ByteArray=new ByteArray();
-						responseBuffer.writeUTFBytes("HTTP/1.1 200 Connection established\r\n\r\n");
-						this.requestSocket.writeBytes(responseBuffer);
-						this.requestSocket.flush();
-					}
-					*/
-					var pipeEvent:PipeEvent = new PipeEvent(PipeEvent.PIPE_CONNECTED,this._indexId,this.requestData);
-					this.dispatchEvent(pipeEvent);
 					trace("header "+this._indexId+"  \n"+this.requestBuffer.toString());
 				}else{
 					trace("no header "+this._indexId);
@@ -231,7 +242,7 @@ package com.webpluz.service{
 			} else if(this.responseContentLength === 0){
 				this.done();
 			}
-			trace("response data.."+this._indexId+" got header?"+(responseHeaderFound?"YES":this.responseBuffer.toString()));
+			//trace("response data.."+this._indexId+" got header?"+(responseHeaderFound?"YES":this.responseBuffer.toString()));
 		}
 
 		private function readChunckedData(response:ByteArray):Boolean{
@@ -243,7 +254,7 @@ package com.webpluz.service{
 			var m:int=0;
 			while (response.position < response.length){
 				m++;
-				if(m>200){
+				if(m>1000){
 					trace("1 too long:m="+m);
 				}
 				headerTest+=response.readUTFBytes(1);
@@ -272,7 +283,7 @@ package com.webpluz.service{
 			//trace('======response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable); 
 			while (response.position < response.length){
 				n++;
-				if(n>200){
+				if(n>1000){
 					trace("tooooooooooooo long..");
 					//trace('response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable);
 				}

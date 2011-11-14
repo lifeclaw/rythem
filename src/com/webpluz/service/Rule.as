@@ -1,4 +1,5 @@
 package com.webpluz.service{
+	import com.webpluz.vo.RequestData;
 
 	public class Rule{
 		public static var RULE_TYPE_REPLACE_IP:String = "RULE_TYPE_REPLACE_IP";
@@ -28,7 +29,7 @@ package com.webpluz.service{
 		public function getPriority():int{
 			return _priority
 		}
-		public function isMatch(headers:Object):Boolean{
+		public function isMatch(requestData:RequestData):Boolean{
 			throw new Error("override this method!(Rule::isRuleMatch");
 			return false;
 		}

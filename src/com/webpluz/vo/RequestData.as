@@ -10,6 +10,7 @@ package com.webpluz.vo {
 		public var port:Number;
 		public var httpVersion:String;
 		public var server:String;
+		public var fullUrl:String;
 		private static const NL:RegExp=new RegExp(/\r?\n/);
 		public function RequestData(headerString:String="") {
 			if(headerString!=""){
@@ -24,6 +25,7 @@ package com.webpluz.vo {
 			method = initialRequestSignatureComponents[0];
 			port = 80;
 			var serverAndPath:String=initialRequestSignatureComponents[1];
+			this.fullUrl = serverAndPath;
 			httpVersion = initialRequestSignatureComponents[2];
 			serverAndPath=serverAndPath.replace(/^http(s)?:\/\//, "");
 			// fix problem when:CONNECT github.com:443 HTTP/1.0

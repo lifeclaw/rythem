@@ -86,20 +86,23 @@ package com.webpluz.service{
 		}
 
 		public function close():void{
+			for each(var s:Socket in this._waitingSockets){
+				try{
+					s.close();
+				}catch(e:Error){
+					trace("close waiting socket error");
+				}
+			}
+			for each(var p:Pipe in this._pipes){
+				p.tearDown();
+			}
 			if (this._serverSocket.listening){
 				try{
 					this._serverSocket.close();
 				}catch (e:Error){
 					//do nothing? 
+					trace("close socket error...");
 				}
-			}
-			for each(var s:Socket in this._waitingSockets){
-				try{
-					s.close();
-				}catch(e:Error){}
-			}
-			for each(var p:Pipe in this._pipes){
-				p.tearDown();
 			}
 		}
 

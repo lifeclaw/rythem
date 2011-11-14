@@ -1,4 +1,6 @@
 package com.webpluz.service{
+	import com.webpluz.vo.RequestData;
+
 	public class IpReplaceRule extends Rule{
 		private var hostName:String;
 		private var ipToChange:String;
@@ -7,7 +9,8 @@ package com.webpluz.service{
 			this.hostName = host.toLocaleLowerCase();
 			this.ipToChange = ip;
 		}
-		public override function isMatch(headers:Object):Boolean{
+		public override function isMatch(requestData:RequestData):Boolean{
+			var headers:Object = requestData.headersObject;
 			var host:String = headers['host'];
 			return (host && host.toLocaleLowerCase() == this.hostName);
 		}

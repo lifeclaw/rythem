@@ -134,7 +134,9 @@ package com.webpluz.service{
 						var newRequestBuffer:ByteArray=new ByteArray();
 						newRequestBuffer.writeUTFBytes(headerString);
 						newRequestBuffer.writeUTFBytes("\r\n\r\n");
-						newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
+						if(this.requestBuffer.bytesAvailable > headerBodyDivision){
+							newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
+						}
 						trace(newRequestBuffer.toString());
 						this.requestBuffer=newRequestBuffer;
 						if(this.requestData.port == 443){//

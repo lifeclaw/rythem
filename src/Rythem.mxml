@@ -64,7 +64,7 @@
 				<!--- request list -->
 				<s:NavigatorContent label="Requests"
 									label.default="Connections">
-					<s:DataGrid includeIn="default" left="0" right="0" top="0" bottom="0" id="pipeList"
+					<s:DataGrid includeIn="default" left="0" right="0" top="0" bottom="0" id="pipeList" borderVisible="false"
 								requestedRowCount="4" itemRenderer="com.webpluz.view.PipeListItemRenderer">
 						<s:columns>
 							<s:ArrayList>
@@ -99,8 +99,8 @@
 					<view:GroupItemRenderer includeIn="setting">
 						
 					</view:GroupItemRenderer>
-					<mx:Tree includeIn="default" x="10" y="10" width="578" height="432"
-							 itemRenderer="com.webpluz.view.RuleGroupRenderer"></mx:Tree>
+					<mx:Tree id="ruleTree" includeIn="default" x="10" y="10" width="578" height="432"
+							 itemRenderer="com.webpluz.view.RuleGroupRenderer" labelField="name"></mx:Tree>
 				</s:NavigatorContent>
 			</mx:TabNavigator>
 		</mx:HDividedBox>

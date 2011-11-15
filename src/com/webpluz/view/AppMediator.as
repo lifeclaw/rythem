@@ -49,12 +49,5 @@ package com.webpluz.view
 				NativeApplication.nativeApplication.exit();
 			}, 2000);
 		}
-		
-		override public function listNotificationInterests():Array{
-			return [];
-		}
-		override public function onRegister( ):void{
-			trace("on register..AppMediator");
-		}
 	}
 }

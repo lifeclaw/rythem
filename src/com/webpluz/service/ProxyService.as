@@ -139,7 +139,8 @@ package com.webpluz.service{
 		private function updateSystemProxy(address:String, port:Number):void{
 			if(this._proxyManager && !this._proxyManager.executing){
 				var proxyServer:URI = new URI(address + ':' + port);
-				var configs:ProxyConfig = new ProxyConfig(proxyServer);
+				var configs:ProxyConfig = new ProxyConfig();
+				configs.addProxyForProtocol(proxyServer, ProxyConfig.HTTP);
 				this._proxyManager.proxy = configs;
 			}
 		}

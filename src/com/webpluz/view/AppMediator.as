@@ -1,5 +1,6 @@
 package com.webpluz.view
 {
+	import com.adobe.net.URI;
 	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfig;
 	import com.jo2.system.ProxyManager;
@@ -29,11 +30,13 @@ package com.webpluz.view
 		protected function cleanup():void{
 			trace('[AppMediator] cleaning up ...');
 			//close proxy service
-			(facade.retrieveProxy(ProxyService.NAME) as ProxyService).close();
+			var proxyService:ProxyService = (facade.retrieveProxy(ProxyService.NAME) as ProxyService);
+			proxyService.close();
 			//restore proxy configurations
-			var config:ProxyConfig = new ProxyConfig(null, 'http://txp-01.tencent.com/lvsproxy.pac');
 			var pm:IProxyManager = ProxyManager.getProxyManager();
-			if(pm) pm.proxy = config;
+			if(pm && proxyService.systemProxyConfig){
+				pm.proxy = proxyService.systemProxyConfig;
+			}
 		}
 		
 		protected function onAppClosing(e:Event):void{

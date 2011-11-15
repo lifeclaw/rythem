@@ -65,7 +65,7 @@
 				<s:NavigatorContent label="Requests"
 									label.default="Connections">
 					<s:DataGrid includeIn="default" left="0" right="0" top="0" bottom="0" id="pipeList"
-								requestedRowCount="4">
+								requestedRowCount="4" itemRenderer="com.webpluz.view.PipeListItemRenderer">
 						<s:columns>
 							<s:ArrayList>
 								<s:GridColumn width="30" dataField="id" headerText="#"></s:GridColumn>

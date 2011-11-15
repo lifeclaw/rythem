@@ -143,8 +143,12 @@ package com.webpluz.service{
 						
 
 						//if proxy is needed here, create a ProxySocket rather than a normal Socket
-						if(this._proxy) this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
-						else this.responseSocket=new Socket();
+						if(this._proxy){
+							this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
+						}
+						else{
+							this.responseSocket=new Socket();
+						}
 						//var k:SecureSocket =  new SecureSocket();
 						
 						this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);

@@ -4,8 +4,8 @@
 			"name": "Test Env",
             "enable": true,
 			"rules": [
-				{"type":"host", "pattern":"www.qq.com", "replace":"127.0.0.1"},
-				{"type":"host", "pattern":"web.qq.com", "replace":"127.0.0.1"}
+				{"enable":true, "type":"host", "pattern":"www.qq.com", "replace":"127.0.0.1"},
+				{"enable":true, "type":"host", "pattern":"web.qq.com", "replace":"127.0.0.1"}
 			]
 		}
 	]

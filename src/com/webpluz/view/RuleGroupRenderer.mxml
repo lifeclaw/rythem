@@ -2,28 +2,67 @@
 <s:MXTreeItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
 					  xmlns:s="library://ns.adobe.com/flex/spark"
 					  xmlns:mx="library://ns.adobe.com/flex/mx"
-					  width.normal="195" height.normal="32">
+					  creationComplete="init(event)">
 	<fx:Script>
 		<![CDATA[
+			import com.webpluz.vo.ProjectConfig;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import spark.components.gridClasses.GridSelectionMode;
+			
+			protected function init(event:FlexEvent):void{
+				
+			}
 			
 			override public function set data(value:Object):void{
 				super.data = value;
+				var rules:ArrayCollection = new ArrayCollection(config.rulesArray);
+				this.labelField.text = config.name;
+				this.enableField.selected = config.enable;
+				this.ruleGrid.dataProvider = rules;
+			}
+			
+			public function get config():ProjectConfig{
+				return this.data as ProjectConfig;
+			}
+			
+			protected function onProjectEnableChange(event:Event):void{
+				trace(config.name, enableField.selected);
 			}
 			
 		]]>
 	</fx:Script>
+	<fx:Declarations>
+		
+	</fx:Declarations>
 	<s:states>
 		<s:State name="normal" />
 		<s:State name="hovered" />
 		<s:State name="selected" />
 	</s:states>
-	<s:HGroup left="0" right="0" top="0" bottom="0" verticalAlign="middle">
-		<s:Rect id="indentationSpacer" width="{treeListData.indent}" percentHeight="100" alpha="0">
-			<s:fill>
-				<s:SolidColor color="0xFFFFFF" />
-			</s:fill>
-		</s:Rect>
-		<s:CheckBox selected="{treeListData.item.enable}"/>
-		<s:Label id="labelField" text="{treeListData.label}" paddingTop="2"/>
-	</s:HGroup>
+	<s:VGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Rect id="indentationSpacer" width="{treeListData.indent}" percentHeight="100" alpha="0">
+				<s:fill>
+					<s:SolidColor color="0xFFFFFF" />
+				</s:fill>
+			</s:Rect>
+			<s:CheckBox id="enableField" change="onProjectEnableChange(event)"/>
+			<s:Label id="labelField" paddingTop="2"/>
+			<s:Spacer width="100%"/>
+			<s:Button label="+"/>
+		</s:HGroup>
+		<s:DataGrid width="100%" id="ruleGrid" selectionMode="{GridSelectionMode.NONE}">
+			<s:columns>
+				<s:ArrayList>
+					<s:GridColumn width="50" dataField="enable" itemRenderer="com.webpluz.view.RuleEnableItemRenderer"></s:GridColumn>
+					<s:GridColumn width="50" dataField="type" headerText="type"></s:GridColumn>
+					<s:GridColumn dataField="pattern" headerText="pattern"></s:GridColumn>
+					<s:GridColumn dataField="replace" headerText="replace"></s:GridColumn>
+				</s:ArrayList>
+			</s:columns>
+		</s:DataGrid>
+	</s:VGroup>
 </s:MXTreeItemRenderer>

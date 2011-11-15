@@ -1,4 +1,5 @@
 package com.webpluz.service{
+	import com.jo2.event.ProxyManagerEvent;
 	import com.jo2.net.URI;
 	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfig;
@@ -36,6 +37,9 @@ package com.webpluz.service{
 		private var _pipeCount:int;
 		private var _waitingSockets:Array;
 		
+		private var _proxyManager:IProxyManager;
+		private var _systemProxyConfig:ProxyConfig;
+		
 		//TODO move this to a model?
 		private var _pipeDatas:Dictionary;
 		
@@ -55,6 +59,18 @@ package com.webpluz.service{
 			_pipeDatas = new Dictionary();
 			this._serverSocket.addEventListener(Event.CONNECT, this.onConnect);
 			_pipeCount = 0;
+			
+			//get current system proxy setting first
+			this._proxyManager = ProxyManager.getProxyManager();
+			if(this._proxyManager){
+				this._proxyManager.addEventListener(ProxyManagerEvent.QUERY_PROXY_SUCCESS, onQueryProxySuccess);
+				this._proxyManager.queryProxy();
+			}
+		}
+		private function onQueryProxySuccess(e:ProxyManagerEvent):void{
+			this._systemProxyConfig = this._proxyManager.proxy;
+			trace('system proxy config is saved');
+			if(this._address) this.updateSystemProxy(_address, _port);
 		}
 		public static function getInstance(bindAddress:String="", bindPort:Number=0):ProxyService{
 			if(!_instance){
@@ -65,6 +81,7 @@ package com.webpluz.service{
 		
 		public function listen(bindIp:String="", bindPort:Number=0):Boolean{
 			this.setupIpAndPort(bindIp, bindPort);
+			this.updateSystemProxy(bindIp, bindPort);
 			if (this._address == "" || this._port == 0){
 				throw new Error("fail to listen ip=" + this._address + " and port=" + this._port);
 				return false;
@@ -86,13 +103,6 @@ package com.webpluz.service{
 				return false;
 			}
 			trace("listened to "+this._address+":"+this._port);
-			
-			//automaticlly set system proxy to this proxy service
-			var proxyServer:URI = new URI(_address + ':' + _port);
-			var configs:ProxyConfig = new ProxyConfig(proxyServer);
-			var pm:IProxyManager = ProxyManager.getProxyManager();
-			if(pm) pm.proxy = configs;
-			
 			return true;
 		}
 
@@ -125,13 +135,22 @@ package com.webpluz.service{
 				this._port=port;
 			}
 		}
+		//automaticlly set system proxy to this proxy service
+		private function updateSystemProxy(address:String, port:Number):void{
+			if(this._proxyManager && !this._proxyManager.executing){
+				var proxyServer:URI = new URI(address + ':' + port);
+				var configs:ProxyConfig = new ProxyConfig(proxyServer);
+				this._proxyManager.proxy = configs;
+			}
+		}
 		
 		private function generateConnecttion():void{
 			while(true || this._pipes.length <2){//TODO 
 				if(this._waitingSockets.length==0){
 					break;
 				}
-				var pipe:Pipe=new Pipe((this._waitingSockets.shift() as Socket),_pipeCount++);
+				var proxy:URI = this._systemProxyConfig ? this._systemProxyConfig.server : null;
+				var pipe:Pipe=new Pipe((this._waitingSockets.shift() as Socket),_pipeCount++, proxy);
 				//_pipeCount++;
 				pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 				pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);

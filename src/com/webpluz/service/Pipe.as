@@ -1,5 +1,7 @@
 // from http://httpeek.googlecode.com/
 package com.webpluz.service{
+	import com.jo2.net.URI;
+	import com.jo2.system.ProxyConfig;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
 	
@@ -52,8 +54,10 @@ package com.webpluz.service{
 		private static const NL:RegExp=new RegExp(/\r?\n/);
 		private static var id:Number=0;
 		private var _indexId:Number;
-		public function Pipe(socket:Socket,indexId:Number=0){
+		private var _proxy:URI;
+		public function Pipe(socket:Socket,indexId:Number=0, proxy:URI = null){
 			
+			this._proxy = proxy;
 			
 			_ruleManager = RuleManager.getInstance();
 			_indexId = id++;
@@ -134,9 +138,10 @@ package com.webpluz.service{
 						if(this.requestData.port == 443){//
 							this.done();
 						}
-	
-						//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
-						this.responseSocket=new Socket();
+						
+						//if proxy is needed here, create a ProxySocket rather than a normal Socket
+						if(this._proxy) this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
+						else this.responseSocket=new Socket();
 						//var k:SecureSocket =  new SecureSocket();
 	
 						this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);

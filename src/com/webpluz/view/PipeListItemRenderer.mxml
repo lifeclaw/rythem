@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" clipAndEnableScrolling="true">
+	
+	<fx:Script>
+		<![CDATA[
+			override public function prepare(hasBeenRecycled:Boolean):void {
+				if(this.data){
+					lblData.text = data[column.dataField];
+					if(data.result){
+						var code:uint = uint(data.result);
+						if(code < 300) 		this.currentState = 'code2xx';
+						else if(code < 400) this.currentState = 'code3xx';
+						else if(code < 500) this.currentState = 'code4xx';
+						else 				this.currentState = 'code5xx';
+					}
+					else this.currentState = 'waiting';
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="waiting"/>
+		<s:State name="code2xx"/>
+		<s:State name="code3xx"/>
+		<s:State name="code4xx"/>
+		<s:State name="code5xx"/>
+	</s:states>
+	<s:Rect width="100%" height="100%" excludeFrom="waiting">
+		<s:fill>
+			<s:SolidColor id="bgColor"
+						  color.code2xx="0x00CC00" color.code3xx="0x00CC00"
+						  color.code4xx="0xCC6666" color.code5xx="0xCC6666"/>
+		</s:fill>
+	</s:Rect>
+	<s:Label id="lblData" top="9" left="7"
+			 color.code2xx="0x006600" color.code3xx="0x006600"/>
+	
+</s:GridItemRenderer>

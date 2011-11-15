@@ -3,9 +3,17 @@
 					  xmlns:s="library://ns.adobe.com/flex/spark"
 					  xmlns:mx="library://ns.adobe.com/flex/mx"
 					  width.normal="195" height.normal="32">
-	
+	<fx:Script>
+		<![CDATA[
+			
+			override public function set data(value:Object):void{
+				super.data = value;
+			}
+			
+		]]>
+	</fx:Script>
 	<s:states>
-		<s:State name="normal" />            
+		<s:State name="normal" />
 		<s:State name="hovered" />
 		<s:State name="selected" />
 	</s:states>
@@ -15,7 +23,7 @@
 				<s:SolidColor color="0xFFFFFF" />
 			</s:fill>
 		</s:Rect>
-		<s:CheckBox includeIn="normal" label="{treeListData.hasChildren}"/>
+		<s:CheckBox selected="{treeListData.item.enable}"/>
 		<s:Label id="labelField" text="{treeListData.label}" paddingTop="2"/>
 	</s:HGroup>
 </s:MXTreeItemRenderer>

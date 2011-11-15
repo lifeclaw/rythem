@@ -24,7 +24,7 @@ package com.webpluz.model
 		private var localConfig:File;
 		private var remoteConfig:URLLoader;
 		private var loading:Boolean;
-		private var config:Vector.<ProjectConfig>;
+		private var config:Array
 		
 		public function ConfigModel(){
 			super(NAME);
@@ -32,7 +32,7 @@ package com.webpluz.model
 			remoteConfig = new URLLoader();
 			remoteConfig.addEventListener(Event.COMPLETE, onRemoteConfigComplete);
 			remoteConfig.addEventListener(IOErrorEvent.IO_ERROR, onRemoteConfigError);
-			config = new Vector.<ProjectConfig>();
+			config = [];
 			trace('[ConfigModel] ready');
 		}
 		
@@ -52,7 +52,7 @@ package com.webpluz.model
 			if(localConfig.exists){
 				trace('[ConfigModel] local config complete');
 				this.processRawConfigDate(FileUtils.readUTFBytes(localConfig));
-				this.sendNotification(UPDATE);
+				this.sendNotification(UPDATE, projects);
 			}
 			else trace('[ConfigModel] local config is missing');
 		}
@@ -69,7 +69,7 @@ package com.webpluz.model
 			trace('[ConfigModel] loading remote config');
 		}
 		
-		public function get projects():Vector.<ProjectConfig>{
+		public function get projects():Array{
 			return this.config;
 		}
 		
@@ -109,7 +109,7 @@ package com.webpluz.model
 			trace('[ConfigModel] remote config complete');
 			loading = false;
 			this.processRawConfigDate(remoteConfig.data);
-			this.sendNotification(UPDATE);
+			this.sendNotification(UPDATE, projects);
 		}
 		
 		private function onRemoteConfigError(e:IOErrorEvent):void{

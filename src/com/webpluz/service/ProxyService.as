@@ -65,11 +65,12 @@ package com.webpluz.service{
 			if(this._proxyManager){
 				this._proxyManager.addEventListener(ProxyManagerEvent.QUERY_PROXY_SUCCESS, onQueryProxySuccess);
 				this._proxyManager.queryProxy();
+				trace('[ProxyService] querying current proxy setting');
 			}
 		}
 		private function onQueryProxySuccess(e:ProxyManagerEvent):void{
 			this._systemProxyConfig = this._proxyManager.proxy;
-			trace('system proxy config is saved');
+			trace('[ProxyService] system proxy config is saved');
 			if(this._address) this.updateSystemProxy(_address, _port);
 		}
 		public static function getInstance(bindAddress:String="", bindPort:Number=0):ProxyService{
@@ -142,6 +143,7 @@ package com.webpluz.service{
 				var configs:ProxyConfig = new ProxyConfig();
 				configs.addProxyForProtocol(proxyServer, ProxyConfig.HTTP);
 				this._proxyManager.proxy = configs;
+				trace('[ProxyService] system proxy updated');
 			}
 		}
 		
@@ -212,6 +214,10 @@ package com.webpluz.service{
 			var event:PipeEvent = e as PipeEvent;
 			//trace("event="+event.type,event.pipeId);
 			this.sendNotification(event.type,event);
+		}
+		
+		public function get systemProxyConfig():ProxyConfig{
+			return this._systemProxyConfig;
 		}
 		
 		// IProxy

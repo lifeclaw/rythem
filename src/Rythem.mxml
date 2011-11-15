@@ -85,11 +85,11 @@
 				<s:NavigatorContent label="Inspector">
 					<mx:VDividedBox id="inspectorGroup" width="100%" height="100%">
 						<s:Group width="100%" height="50%">
-							<s:TextArea id="request"
+							<s:TextArea id="request" borderVisible="false"
 										width.default="100%" height.default="100%"/>
 						</s:Group>
 						<s:Group width="100%" height="50%">
-							<s:TextArea id="response"
+							<s:TextArea id="response" borderVisible="false"
 										width.default="100%" height.default="100%"/>
 						</s:Group>
 					</mx:VDividedBox>

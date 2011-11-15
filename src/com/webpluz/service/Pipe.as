@@ -1,5 +1,7 @@
 // from http://httpeek.googlecode.com/
 package com.webpluz.service{
+	import com.jo2.net.URI;
+	import com.jo2.system.ProxyConfig;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
 	
@@ -13,11 +15,11 @@ package com.webpluz.service{
 	import flash.net.URLRequestHeader;
 	import flash.net.dns.DNSResolver;
 	import flash.utils.ByteArray;
-
+	
 	[Event(name="PIPE_CONNECTED", type="com.webpluz.service.PipeEvent")]
 	[Event(name="PIPE_COMPLETE", type="com.webpluz.service.PipeEvent")]
 	[Event(name="PIPE_ERROR", type="com.webpluz.service.PipeEvent")]
-
+	
 	public class Pipe extends EventDispatcher{
 		private var requestSocket:Socket;
 		private var responseSocket:Socket;
@@ -33,7 +35,7 @@ package com.webpluz.service{
 		private var responseChunkLastLen:Number=0;
 		private var responseChunkLastRead:Number=0;
 		private var responseBodyBuffer:ByteArray;
-
+		
 		
 		private var requestData:RequestData;
 		private var responseData:ResponseData;
@@ -41,19 +43,23 @@ package com.webpluz.service{
 		private var completeEvent:PipeEvent;
 		private var connectEvent:PipeEvent;
 		private var errorEvent:PipeEvent;
+		
+		private var _tearDowned:Boolean=false;
 		/*
 		public var responseResult:String;
 		public var responseHeaderString:String;
 		public var responseBody:String;
 		*/
 		private var _ruleManager:RuleManager;
-
+		
 		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		private static const NL:RegExp=new RegExp(/\r?\n/);
 		private static var id:Number=0;
 		private var _indexId:Number;
-		public function Pipe(socket:Socket,indexId:Number=0){
+		private var _proxy:URI;
+		public function Pipe(socket:Socket,indexId:Number=0, proxy:URI = null){
 			
+			this._proxy = proxy;
 			
 			_ruleManager = RuleManager.getInstance();
 			_indexId = id++;
@@ -136,11 +142,13 @@ package com.webpluz.service{
 						if(this.requestData.port == 443){//
 							this.done();
 						}
-	
-						//this.responseSocket=new ProxySocket("proxy.tencent.com",8080);
-						this.responseSocket=new Socket();
+						
+
+						//if proxy is needed here, create a ProxySocket rather than a normal Socket
+						if(this._proxy) this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
+						else this.responseSocket=new Socket();
 						//var k:SecureSocket =  new SecureSocket();
-	
+						
 						this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
 						//this.responseSocket.addEventListener(ProxySocketEvent.CONNECTED, onResponseSocketConnect);
 						this.responseSocket.addEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
@@ -153,13 +161,13 @@ package com.webpluz.service{
 						this.responseSocket.connect(serverToConnect, requestData.port);
 						/*
 						if (this.requestHeaders['Method'] == "CONNECT"){ //HTTP/1.1 200 Connection established\r\nConnection: keep-alive\r\n\r\n
-							//HTTP/1.1 200 Connection established
-							trace("secureSocket---------------");
-	
-							var responseBuffer:ByteArray=new ByteArray();
-							responseBuffer.writeUTFBytes("HTTP/1.1 200 Connection established\r\n\r\n");
-							this.requestSocket.writeBytes(responseBuffer);
-							this.requestSocket.flush();
+						//HTTP/1.1 200 Connection established
+						trace("secureSocket---------------");
+						
+						var responseBuffer:ByteArray=new ByteArray();
+						responseBuffer.writeUTFBytes("HTTP/1.1 200 Connection established\r\n\r\n");
+						this.requestSocket.writeBytes(responseBuffer);
+						this.requestSocket.flush();
 						}
 						*/
 					}
@@ -179,14 +187,14 @@ package com.webpluz.service{
 				}
 			}
 		}
-
+		
 		private function onResponseSocketIOError(e:IOErrorEvent):void{
 			trace("responseSocketIOError:"+e.errorID, e.type, e.text);
 			errorEvent = new PipeEvent(PipeEvent.PIPE_ERROR,this._indexId);
 			this.dispatchEvent(errorEvent);
 			this.tearDown();
 		}
-
+		
 		private function onResponseSocketConnect(e:Event):void{
 			trace("onResponseSocketCOnnect"+this._indexId);
 			this.responseSocket.writeBytes(this.requestBuffer);
@@ -194,8 +202,11 @@ package com.webpluz.service{
 			//var _headerEvent:HTTPHeadersEvent = new HTTPHeadersEvent();
 			//this.dispatchEvent(_headerEvent);
 		}
-
+		
 		private function onResponseSocketData(e:ProgressEvent):void{
+			if(_tearDowned){
+				return;
+			}
 			if (!this.testSocket(this.requestSocket))
 				return;
 			var position:Number=this.responseBuffer.length;
@@ -225,7 +236,7 @@ package com.webpluz.service{
 					this.responseBuffer.position = headerCheck + 4;//TODO error when server return "\n\n" as body's seperator
 				}
 			}
-
+			
 			if (this.responseData.resultCode == "204" ||  this.responseData.resultCode == "304" || this.responseData.resultCode == "302"
 				|| this.responseData.resultCode == "307"){
 				this.done();
@@ -246,7 +257,7 @@ package com.webpluz.service{
 			}
 			//trace("response data.."+this._indexId+" got header?"+(responseHeaderFound?"YES":this.responseBuffer.toString()));
 		}
-
+		
 		private function readChunckedData(response:ByteArray):Boolean{
 			response.position=0;
 			
@@ -277,10 +288,10 @@ package com.webpluz.service{
 			var len:Number=0;
 			var byte:String;
 			/*
-			 * chunked data example:
-			 * \r\nF\r\nthis is content\r\n5\r\nhello\r\n0\r\n\r\n
-			 *
-			 */
+			* chunked data example:
+			* \r\nF\r\nthis is content\r\n5\r\nhello\r\n0\r\n\r\n
+			*
+			*/
 			var n:int=0;
 			//trace('======response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable); 
 			while (response.position < response.length){
@@ -307,23 +318,23 @@ package com.webpluz.service{
 			}
 			return false;
 		}
-
+		
 		private function onResponseSocketClose(e:Event):void{
 			trace('response close');
 			this.done();
 		}
-
+		
 		private function onRequestSocketClose(e:Event):void{
 			trace('request close');
 			this.done();
 		}
-
+		
 		private function done():void{
 			this.tearDown();
 			completeEvent = new PipeEvent(PipeEvent.PIPE_COMPLETE,this._indexId,this.requestData,this.responseData);
 			this.dispatchEvent(completeEvent);
 		}
-
+		
 		private function testSocket(socket:Socket):Boolean{
 			if (!socket.connected){
 				trace('not connect');
@@ -332,14 +343,18 @@ package com.webpluz.service{
 			}
 			return true;
 		}
-
+		
 		public function tearDown():void{
+			trace('teardown..');
+			_tearDowned = true;
 			if (this.requestSocket != null && this.requestSocket.connected){
+				//trace('teardown..1');
 				this.requestSocket.flush();
 				this.requestSocket.close();
 			}
-
+			
 			if (this.responseSocket != null && this.responseSocket.connected){
+				//trace('teardown..2');
 				this.responseSocket.flush();
 				this.responseSocket.close();
 			}

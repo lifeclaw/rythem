@@ -34,7 +34,7 @@ package com.webpluz.vo
 			}
 		}
 		
-		public function matchRule(value:String):ReplaceRule{
+		public function matchRule(value:String):Rule{
 			return null;
 		}
 		

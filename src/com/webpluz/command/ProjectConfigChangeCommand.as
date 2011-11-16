@@ -6,7 +6,6 @@ package com.webpluz.command
 	import com.webpluz.vo.ContentReplaceRule;
 	import com.webpluz.vo.IpReplaceRule;
 	import com.webpluz.vo.ProjectConfig;
-	import com.webpluz.vo.ReplaceRule;
 	import com.webpluz.vo.Rule;
 	
 	import org.puremvc.as3.interfaces.INotification;

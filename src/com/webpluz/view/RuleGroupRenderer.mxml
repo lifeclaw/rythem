@@ -7,7 +7,6 @@
 		<![CDATA[
 			import com.webpluz.event.ProjectConfigEvent;
 			import com.webpluz.vo.ProjectConfig;
-			import com.webpluz.vo.ReplaceRule;
 			
 			import flash.events.Event;
 			

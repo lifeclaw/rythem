@@ -38,6 +38,7 @@ package com.webpluz.service{
 				rulesLow.push(new ContentReplaceRule("http://iptton.com/","./rythemReplace/test.html"));
 			}*/
 			rulesLow.push(new ContentReplaceRule("/hello/world/","./rythemReplace/folderRule/"));
+			rulesLow.push(new ContentReplaceRule("http://iptton.com/combine.html","./rythemReplace/combineRule/combine.qzmin"));
 		}
 		public function addRule(r:Rule):void{
 			switch(r.getPriority()){

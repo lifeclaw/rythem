@@ -1,9 +1,11 @@
 package com.webpluz.vo{
 	
+	import com.webpluz.service.Rule;
+	
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-	import com.webpluz.service.Rule;
+	
 
 	public class ContentReplaceRule extends Rule{
 		
@@ -78,7 +80,7 @@ package com.webpluz.vo{
 					fileStream.open(_file ,FileMode.READ);
 					contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
 					fileStream.close();
-					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 5)){
+					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 6)){
 						_replaceContent = this.readFileByMerge(contentOfUrl);
 					}else{
 						_replaceContent = contentOfUrl;
@@ -97,14 +99,28 @@ package com.webpluz.vo{
 		
 		private function readFileByMerge(qzminContent:String):String{
 			var result:String="";
-			var obj:Object = JSON.parse(qzminContent);
+			trace(qzminContent);
+			qzminContent = qzminContent.replace(/\r|\n/g,"");
+			qzminContent = qzminContent.replace(/\s+([^\s:\"{}]+):/g,"\"$1\":");
+			trace(qzminContent);
+			var obj:Object;
+			try{
+				obj = JSON.parse(qzminContent);
+			}catch(e:Error){
+				trace(e.message,qzminContent);
+				
+				return qzminContent+" is not a validate json data";
+			}
 			var fileToRead:File;
 			//TODO validate the qzmin file content
 			//if(obj && obj.projects && obj.projects[0] && obj.projects[0]){
 				var includes:Array = obj.projects[0]['include'];
 				var fileStream:FileStream = new FileStream();
+				var folder:String = this._replaceUrl.substring(0,this._replaceUrl.lastIndexOf("/")+1);
 				for each(var i:String in includes){
-					fileToRead = new File(i);
+					i = i.replace("./","");
+					fileToRead = File.userDirectory.resolvePath(folder+i);
+					//fileToRead = new File(i);
 					if(fileToRead.exists){
 						fileStream.open(fileToRead,FileMode.READ);
 						result += fileStream.readUTFBytes(fileStream.bytesAvailable);
@@ -115,7 +131,7 @@ package com.webpluz.vo{
 					}
 				}
 			//}
-			
+			trace(result);
 			return result;
 		}
 		

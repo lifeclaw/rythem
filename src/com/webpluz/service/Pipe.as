@@ -154,13 +154,10 @@ package com.webpluz.service{
 						//var k:SecureSocket =  new SecureSocket();
 						
 						this.responseSocket.addEventListener(Event.CONNECT, onResponseSocketConnect);
-						//this.responseSocket.addEventListener(ProxySocketEvent.CONNECTED, onResponseSocketConnect);
 						this.responseSocket.addEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
-						//this.responseSocket.addEventListener(ProxySocketEvent.SOCKET_DATA, onResponseSocketData);
 						this.responseSocket.addEventListener(Event.CLOSE, onResponseSocketClose);
 						this.responseSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
 						this.responseSocket.addEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
-						//this.responseSocket.addEventListener(ProxySocketEvent.ERROR, onResponseSocketIOError);
 						//trace("connecting:",requestData.server, requestData.port);
 						this.responseSocket.connect(serverToConnect, requestData.port);
 						/*
@@ -353,12 +350,21 @@ package com.webpluz.service{
 			_tearDowned = true;
 			if (this.requestSocket != null && this.requestSocket.connected){
 				//trace('teardown..1');
+				this.requestSocket.removeEventListener(ProgressEvent.SOCKET_DATA, onRequestSocketData);
+				this.requestSocket.removeEventListener(Event.CLOSE, onRequestSocketClose);
+				
 				this.requestSocket.flush();
 				this.requestSocket.close();
 			}
 			
 			if (this.responseSocket != null && this.responseSocket.connected){
 				//trace('teardown..2');
+				this.responseSocket.removeEventListener(Event.CONNECT, onResponseSocketConnect);
+				this.responseSocket.removeEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
+				this.responseSocket.removeEventListener(Event.CLOSE, onResponseSocketClose);
+				this.responseSocket.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
+				this.responseSocket.removeEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
+				
 				this.responseSocket.flush();
 				this.responseSocket.close();
 			}

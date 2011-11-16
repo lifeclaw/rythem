@@ -3,6 +3,7 @@ package com.webpluz.service{
 	
 	import flash.system.Capabilities;
 	import flash.utils.Proxy;
+	import com.webpluz.vo.ContentReplaceRule;
 
 	public class RuleManager extends Proxy{
 		protected static var instance:RuleManager=null;
@@ -36,6 +37,7 @@ package com.webpluz.service{
 			}else{
 				rulesLow.push(new ContentReplaceRule("http://iptton.com/","./rythemReplace/test.html"));
 			}*/
+			rulesLow.push(new ContentReplaceRule("/hello/world/","./rythemReplace/folderRule/"));
 		}
 		public function addRule(r:Rule):void{
 			switch(r.getPriority()){

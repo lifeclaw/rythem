@@ -68,7 +68,7 @@ package com.webpluz.vo{
 						contentLength = contentOfUrl.length;
 						_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
 							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
-							+this._replaceContent;
+							+contentOfUrl;
 					}else{
 						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";
 						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;

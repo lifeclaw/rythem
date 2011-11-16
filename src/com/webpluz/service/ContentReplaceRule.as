@@ -12,46 +12,87 @@ package com.webpluz.service{
 		private var _replaceUrl:String;
 		private var _urlRule:String;
 		
+		private var _isDirectoryRule:Boolean = false;
+		
 		public function ContentReplaceRule(urlRule:String,replaceUrl:String){
-			super(Rule.RULE_TYPE_REPLACE_SINGLE_CONTENT);
+			super(Rule.RULE_TYPE_REPLACE_CONTENT);
 			this._replaceUrl = replaceUrl;
 			this._urlRule = urlRule;
+			
+			if(this._urlRule[this._urlRule.length-1] == '/'){
+				this._isDirectoryRule = true;
+			}
 			
 			this._replaceContent = "";
 		}
 		public override function isMatch(requestData:RequestData):Boolean{
 			// only exactly match
-			trace(this._urlRule,requestData.fullUrl);
-			return (this._urlRule.indexOf(requestData.fullUrl) == 0);
+			// trace(this._urlRule,requestData.fullUrl);
+			
+			if(this._isDirectoryRule){// direcory rule,request must no end with "/"
+				if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
+					if(requestData.path.indexOf(this._urlRule) == (requestData.path.lastIndexOf('/') - this._urlRule.length +1)){
+						return true;
+					}
+					return false;
+				}else{
+					return false;
+				}
+			}else{
+				return (this._urlRule.indexOf(requestData.fullUrl) == 0);
+			}
 		}
-		public function getContent():String{
+		public function getContent(requestData:RequestData=null):String{
 			// TODO monitor the file content's change
-			if(!_replaceContent){
-				this.readFile();
+			if(this._isDirectoryRule || !_replaceContent){// @TODO  directory rule need to refresh content in every request,do some cache. 
+				_replaceContent = this.readFile(requestData);
 			}
 			return _replaceContent;
 		}
 		
-		private function readFile():void{
+		private function readFile(requestData:RequestData=null):String{
 			_file = File.userDirectory.resolvePath(this._replaceUrl);
 			var fileStream:FileStream = new FileStream();
+			var noSuchFileError:String;
+			var contentLength:Number;
+			var contentOfUrl:String;
 			if(_file.exists){
-				fileStream.open(_file ,FileMode.READ);
-				var contentOfUrl:String = fileStream.readUTFBytes(fileStream.bytesAvailable);
-				fileStream.close();
-				if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 5)){
-					_replaceContent = this.readFileByMerge(contentOfUrl);
+				if(_isDirectoryRule){// directory
+					var tmp:Array = requestData.path.split("/");
+					var fileName:String = tmp[tmp.length-1];
+					_file = File.userDirectory.resolvePath(this._replaceUrl+fileName);
+					if(_file.exists){
+						fileStream.open(_file ,FileMode.READ);
+						contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
+						fileStream.close();
+						contentLength = contentOfUrl.length;
+						_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
+							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
+							+this._replaceContent;
+					}else{
+						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";
+						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
+					}
+					
 				}else{
-					_replaceContent = contentOfUrl;
+					fileStream.open(_file ,FileMode.READ);
+					contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
+					fileStream.close();
+					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 5)){
+						_replaceContent = this.readFileByMerge(contentOfUrl);
+					}else{
+						_replaceContent = contentOfUrl;
+					}
+					contentLength = _replaceContent.length;
+					_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
+						+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
+						+this._replaceContent;
 				}
-				var contentLength:Number = _replaceContent.length;
-				_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
-					+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
-					+this._replaceContent;
 			}else{
-				var noSuchFileError:String = "Rythem cannot resolve this path["+this._replaceUrl+"]";
+				noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+"]";
 				_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 			}
+			return _replaceContent;
 		}
 		
 		private function readFileByMerge(qzminContent:String):String{

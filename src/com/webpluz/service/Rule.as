@@ -3,10 +3,10 @@ package com.webpluz.service{
 
 	public class Rule{
 		public static var RULE_TYPE_REPLACE_IP:String = "RULE_TYPE_REPLACE_IP";
-		public static var RULE_TYPE_REPLACE_SINGLE_CONTENT:String = "RULE_TYPE_REPLACE_SINGLE_CONTENT";
-		public static var RULE_TYPE_DICTORY:String = "RULE_TYPE_DICTORY";
-		public static var RULE_TYPE_COMBINE:String = "RULE_TYPE_COMBINE";
-		public static var ruleTypes:Array = [RULE_TYPE_REPLACE_IP,RULE_TYPE_REPLACE_SINGLE_CONTENT,RULE_TYPE_DICTORY,RULE_TYPE_COMBINE];
+		public static var RULE_TYPE_REPLACE_CONTENT:String = "RULE_TYPE_REPLACE_CONTENT";
+		/*public static var RULE_TYPE_DICTORY:String = "RULE_TYPE_DICTORY";
+		public static var RULE_TYPE_COMBINE:String = "RULE_TYPE_COMBINE";*/
+		public static var ruleTypes:Array = [RULE_TYPE_REPLACE_IP,RULE_TYPE_REPLACE_CONTENT/*,RULE_TYPE_DICTORY,RULE_TYPE_COMBINE*/];
 		
 		public static var RULE_PRIORITY_LOW:int = 0;
 		public static var RULE_PRIORITY_NORMAL:int = 1;

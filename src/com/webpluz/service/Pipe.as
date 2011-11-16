@@ -105,12 +105,8 @@ package com.webpluz.service{
 						var ruleType:String = matchedRule.getType();
 						if(ruleType!=Rule.RULE_TYPE_REPLACE_IP){
 							switch(ruleType){
-								case Rule.RULE_TYPE_COMBINE:
-									break;
-								case Rule.RULE_TYPE_DICTORY:
-									break;
-								case Rule.RULE_TYPE_REPLACE_SINGLE_CONTENT:
-									var autoResponse:String = (matchedRule as ContentReplaceRule).getContent();
+								case Rule.RULE_TYPE_REPLACE_CONTENT:
+									var autoResponse:String = (matchedRule as ContentReplaceRule).getContent(requestData);
 									var headerAndBody:Array = autoResponse.split("\r\n\r\n");
 									this.responseData.parseHeader(headerAndBody[0]);
 									this.responseData.rawData = autoResponse;

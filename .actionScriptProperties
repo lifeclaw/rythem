@@ -12,6 +12,7 @@
       <libraryPathEntry kind="1" linkType="1" path="libs"/>
       <libraryPathEntry kind="3" linkType="1" path="library/JO2/JO2.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="library/PureMVC/PureMVC_AS3_2_0_4.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="library/AS3CoreLib/as3corelib_0.93.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
@@ -32,4 +33,3 @@
     </buildTarget>
   </buildTargets>
 </actionScriptProperties>
-

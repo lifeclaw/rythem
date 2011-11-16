@@ -1,10 +1,12 @@
 package com.webpluz.vo
 {
+	import flash.events.EventDispatcher;
+
 	public final class ProjectConfig
 	{
-		public var name:String;
-		public var enable:Boolean;
-		public var rules:Object;
+		[Bindable]public var name:String;
+		[Bindable]public var enable:Boolean;
+		[Bindable]public var rules:Object;
 		
 		public static function instantiateFromObject(value:Object):ProjectConfig{
 			var instance:ProjectConfig = new ProjectConfig(value.name, value.enable);
@@ -22,6 +24,14 @@ package com.webpluz.vo
 		
 		public function addRule(value:ReplaceRule):void{
 			rules[value.pattern] = value;
+		}
+		
+		public function get rulesArray():Array{
+			var result:Array = [];
+			for each(var rule:ReplaceRule in this.rules){
+				result.push(rule);
+			}
+			return result;
 		}
 		
 		public function matchRule(value:String):ReplaceRule{

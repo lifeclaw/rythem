@@ -4,8 +4,7 @@
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:view="com.webpluz.view.*"
 					   xmlns:local="*"
-					   width="960" height="600" creationComplete="init(event)"
-					   width.default="866" height.default="506">
+					   width="1280" height="800" creationComplete="init(event)">
 	<fx:Style source="Rythem.css"/>
 	<fx:Script>
 		<![CDATA[
@@ -81,7 +80,7 @@
 					</s:DataGrid>
 				</s:NavigatorContent>
 			</mx:TabNavigator>
-			<mx:TabNavigator width="70%" height="100%" paddingTop="0">
+			<mx:TabNavigator width="70%" height="100%" paddingTop="0" selectedIndex="1">
 				<s:NavigatorContent label="Inspector">
 					<mx:VDividedBox id="inspectorGroup" width="100%" height="100%">
 						<s:Group width="100%" height="50%">
@@ -99,8 +98,10 @@
 					<view:GroupItemRenderer includeIn="setting">
 						
 					</view:GroupItemRenderer>
-					<mx:Tree id="ruleTree" includeIn="default" x="10" y="10" width="578" height="432"
-							 itemRenderer="com.webpluz.view.RuleGroupRenderer" labelField="name"></mx:Tree>
+					<mx:Tree id="ruleTree" includeIn="default" right="10" left="10" top="10" bottom="10"
+							 variableRowHeight="true" itemRenderer="com.webpluz.view.RuleGroupRenderer"
+							 rollOverColor="0xFFFFFF" selectionColor="0xFFFFFF">
+					</mx:Tree>
 				</s:NavigatorContent>
 			</mx:TabNavigator>
 		</mx:HDividedBox>

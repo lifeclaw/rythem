@@ -35,6 +35,7 @@ package
 		override protected function initializeController():void{
 			super.initializeController();
 			this.registerCommand(STARTUP, StartupCommand);
+			this.registerCommand(AppMediator.MAIN_TAB_CHANGE, MainTabNavigatorChangeCommand);
 			this.registerCommand(RuleTreeMediator.CHANGE, ProjectConfigChangeCommand);
 		}
 		

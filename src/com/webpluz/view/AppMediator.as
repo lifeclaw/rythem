@@ -17,10 +17,13 @@ package com.webpluz.view
 	{
 		public static const NAME:String = 'AppMediator';
 		
+		public static const MAIN_TAB_CHANGE:String = 'mediator.app.mainTabChange';
+		
 		public function AppMediator(viewComponent:Object)
 		{
 			super(NAME, viewComponent);
 			app.addEventListener(Event.CLOSING, onAppClosing);
+			app.mainTabNavigator.addEventListener(Event.CHANGE, onTabChildChanged);
 		}
 		
 		public function get app():Rythem{
@@ -37,6 +40,10 @@ package com.webpluz.view
 			if(pm && proxyService.systemProxyConfig){
 				pm.proxy = proxyService.systemProxyConfig;
 			}
+		}
+		
+		protected function onTabChildChanged(e:Event):void{
+			this.sendNotification(MAIN_TAB_CHANGE, app);
 		}
 		
 		protected function onAppClosing(e:Event):void{

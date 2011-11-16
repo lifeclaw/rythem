@@ -16,7 +16,6 @@ package com.webpluz.command
 			facade.registerMediator(new AppMediator(app));
 			facade.registerMediator(new RuleTreeMediator(app.ruleTree));
 			facade.registerMediator(new PipeListMediator(app.pipeList));
-			facade.registerMediator(new InspectorMediator(app.request,app.response));
 		}
 	}
 }

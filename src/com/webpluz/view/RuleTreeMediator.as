@@ -43,7 +43,7 @@ package com.webpluz.view
 		
 		private function onRuleChange(e:ProjectConfigEvent):void{
 			e.stopPropagation();
-			this.sendNotification(CHANGE, e.config);
+			this.sendNotification(CHANGE, e);
 		}
 	}
 }

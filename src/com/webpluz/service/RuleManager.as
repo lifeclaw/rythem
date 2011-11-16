@@ -17,7 +17,7 @@ package com.webpluz.service{
 			rulesNormal = new Array();
 			rulesHigh = new Array();
 			instance = this;
-			
+			/*
 			rulesLow.push(new IpReplaceRule("web2.qq.com","113.108.4.143"));
 			rulesLow.push(new IpReplaceRule("web.qstatic.com","113.108.4.143"));
 			rulesLow.push(new IpReplaceRule("0.web.qstatic.com","113.108.4.143"));
@@ -35,7 +35,7 @@ package com.webpluz.service{
 				rulesLow.push(new ContentReplaceRule("http://iptton.com/","E:/rythemReplace/test.html"));
 			}else{
 				rulesLow.push(new ContentReplaceRule("http://iptton.com/","./rythemReplace/test.html"));
-			}
+			}*/
 		}
 		public function addRule(r:Rule):void{
 			switch(r.getPriority()){
@@ -49,6 +49,26 @@ package com.webpluz.service{
 				default:
 					rulesNormal.push(r);
 					break;
+			}
+		}
+		public function removeRule(r:Rule):void{
+			var index:int;
+			switch(r.getPriority()){
+				case Rule.RULE_PRIORITY_LOW:
+					index = rulesLow.indexOf(r);
+					if(index != -1) rulesLow.splice(index);
+					break;
+					
+				case Rule.RULE_PRIORITY_HIGH:
+					index = rulesHigh.indexOf(r);
+					if(index != -1) rulesHigh.splice(index);
+					break;
+				
+				case Rule.RULE_PRIORITY_NORMAL:
+					index = rulesNormal.indexOf(r);
+					if(index != -1) rulesNormal.splice(index);
+					break;
+				
 			}
 		}
 		public function getRule(requestData:RequestData):Rule{

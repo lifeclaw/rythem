@@ -39,13 +39,15 @@
 				e.stopPropagation();
 				this.ruleGrid.enabled = enableField.selected;
 				this.config.enable = enableField.selected;
-				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, true));
+				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, this.config.rulesArray, true));
 			}
 			
 			//dispatch change event when user enable/disable replace rule
 			protected function onRuleEnableChange(e:Event):void{
 				e.stopPropagation();
-				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, true));
+				var itemRenderer:RuleEnableItemRenderer = e.target as RuleEnableItemRenderer;
+				var changeRules:Array = itemRenderer ? [itemRenderer.rule] : [];
+				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, changeRules, true));
 			}
 			
 		]]>

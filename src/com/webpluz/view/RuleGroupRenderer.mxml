@@ -7,14 +7,18 @@
 		<![CDATA[
 			import com.webpluz.event.ProjectConfigEvent;
 			import com.webpluz.vo.ProjectConfig;
+			import com.webpluz.vo.Rule;
 			
 			import flash.events.Event;
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.EventPriority;
+			import mx.events.CollectionEvent;
 			import mx.events.FlexEvent;
 			
 			import spark.components.gridClasses.GridSelectionMode;
+			import spark.events.GridItemEditorEvent;
+			import spark.events.GridSortEvent;
 			
 			protected function init(event:FlexEvent):void{
 				this.addEventListener(Event.CHANGE, onRuleEnableChange);
@@ -38,7 +42,7 @@
 				e.stopPropagation();
 				this.ruleGrid.enabled = enableField.selected;
 				this.config.enable = enableField.selected;
-				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, this.config.rules, true));
+				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, config.rules, true));
 			}
 			
 			//dispatch change event when user enable/disable replace rule
@@ -47,6 +51,14 @@
 				var itemRenderer:RuleEnableItemRenderer = e.target as RuleEnableItemRenderer;
 				var changeRules:Array = itemRenderer ? [itemRenderer.rule] : [];
 				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, changeRules, true));
+			}
+			
+			protected function onRuleItemEditorSave(event:GridItemEditorEvent):void{
+				trace('session save');
+			}
+			
+			protected function onRulesSortChange(event:GridSortEvent):void{
+				
 			}
 			
 		]]>
@@ -75,7 +87,7 @@
 		</s:HGroup>
 		
 		<!--- replace rules -->
-		<s:DataGrid width="100%" id="ruleGrid" editable="true">
+		<s:DataGrid width="100%" id="ruleGrid" editable="true" gridItemEditorSessionSave="onRuleItemEditorSave(event)" sortChange="onRulesSortChange(event)">
 			<s:columns>
 				<s:ArrayList>
 					<s:GridColumn width="50" dataField="enable" itemRenderer="com.webpluz.view.RuleEnableItemRenderer"></s:GridColumn>

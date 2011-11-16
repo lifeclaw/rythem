@@ -75,13 +75,13 @@
 		</s:HGroup>
 		
 		<!--- replace rules -->
-		<s:DataGrid width="100%" id="ruleGrid" selectionMode="{GridSelectionMode.NONE}">
+		<s:DataGrid width="100%" id="ruleGrid" editable="true">
 			<s:columns>
 				<s:ArrayList>
 					<s:GridColumn width="50" dataField="enable" itemRenderer="com.webpluz.view.RuleEnableItemRenderer"></s:GridColumn>
 					<s:GridColumn width="50" dataField="type" headerText="type"></s:GridColumn>
-					<s:GridColumn dataField="pattern" headerText="pattern"></s:GridColumn>
-					<s:GridColumn dataField="replace" headerText="replace"></s:GridColumn>
+					<s:GridColumn dataField="pattern" headerText="pattern" itemEditor="com.webpluz.view.RuleTextInputItemEditor"></s:GridColumn>
+					<s:GridColumn dataField="replace" headerText="replace" itemEditor="com.webpluz.view.RuleTextInputItemEditor"></s:GridColumn>
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>

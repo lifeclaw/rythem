@@ -17,12 +17,8 @@ package com.webpluz.vo{
 		
 		public function ContentReplaceRule(urlRule:String,replaceUrl:String, enbale:Boolean = true){
 			super(Rule.RULE_TYPE_REPLACE_CONTENT, RULE_PRIORITY_NORMAL, enbale);
-			this._replaceUrl = replaceUrl;
-			this._urlRule = urlRule;
-			
-			if(this._urlRule.charAt(this._urlRule.length-1) == '/'){
-				this._isDirectoryRule = true;
-			}
+			this.replace = replaceUrl;
+			this.pattern = urlRule;
 			
 			this._replaceContent = "";
 		}
@@ -137,8 +133,17 @@ package com.webpluz.vo{
 		public function get pattern():String{
 			return this._urlRule;
 		}
+		public function set pattern(value:String):void{
+			this._urlRule = value;
+			if(this._urlRule.charAt(this._urlRule.length-1) == '/'){
+				this._isDirectoryRule = true;
+			}
+		}
 		public function get replace():String{
 			return this._replaceUrl;
+		}
+		public function set replace(value:String):void{
+			this._replaceUrl = value;
 		}
 		
 		override public function isEqual(anotherRule:*):Boolean{

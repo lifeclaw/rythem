@@ -2,8 +2,8 @@ package com.webpluz.command
 {
 	import com.webpluz.event.ProjectConfigEvent;
 	import com.webpluz.model.ConfigModel;
-	import com.webpluz.service.ContentReplaceRule;
-	import com.webpluz.service.IpReplaceRule;
+	import com.webpluz.vo.ContentReplaceRule;
+	import com.webpluz.vo.IpReplaceRule;
 	import com.webpluz.service.Rule;
 	import com.webpluz.service.RuleManager;
 	import com.webpluz.vo.ProjectConfig;

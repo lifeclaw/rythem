@@ -1,5 +1,5 @@
-package com.webpluz.service{
-	import com.webpluz.vo.RequestData;
+package com.webpluz.vo{
+	import com.webpluz.service.Rule;
 
 	public class IpReplaceRule extends Rule{
 		private var hostName:String;

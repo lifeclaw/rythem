@@ -15,6 +15,8 @@ package com.webpluz.service{
 	import flash.net.URLRequestHeader;
 	import flash.net.dns.DNSResolver;
 	import flash.utils.ByteArray;
+	import com.webpluz.vo.ContentReplaceRule;
+	import com.webpluz.vo.IpReplaceRule;
 	
 	[Event(name="PIPE_CONNECTED", type="com.webpluz.service.PipeEvent")]
 	[Event(name="PIPE_COMPLETE", type="com.webpluz.service.PipeEvent")]

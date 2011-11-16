@@ -1,9 +1,9 @@
-package com.webpluz.service{
-	import com.webpluz.vo.RequestData;
+package com.webpluz.vo{
 	
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+	import com.webpluz.service.Rule;
 
 	public class ContentReplaceRule extends Rule{
 		
@@ -19,7 +19,7 @@ package com.webpluz.service{
 			this._replaceUrl = replaceUrl;
 			this._urlRule = urlRule;
 			
-			if(this._urlRule[this._urlRule.length-1] == '/'){
+			if(this._urlRule.charAt(this._urlRule.length-1) == '/'){
 				this._isDirectoryRule = true;
 			}
 			

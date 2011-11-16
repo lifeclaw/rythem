@@ -97,6 +97,9 @@ package com.webpluz.service{
 					serverToConnect = requestData.server;
 					requestData.body = bufferString.substr(headerBodyDivision);
 					
+					if(false){//@TODO disable cache,remove "If-Modified-Since"
+						headerString = headerString.replace(/If\-modified\-since.*?\r\n/i,"");
+					}
 					headerString = headerString.replace(/proxy\-connection.*?\r\n/i,"");
 					
 					

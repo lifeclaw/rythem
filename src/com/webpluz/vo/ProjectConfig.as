@@ -11,7 +11,7 @@ package com.webpluz.vo
 		public static function instantiateFromObject(value:Object):ProjectConfig{
 			var instance:ProjectConfig = new ProjectConfig(value.name, value.enable);
 			for each(var rule:Object in value.rules){
-				instance.addRule(new ReplaceRule(rule.pattern, rule.replace, rule.type));
+				instance.addRule(new ReplaceRule(rule.pattern, rule.replace, rule.type, rule.enable));
 			}
 			return instance;
 		}

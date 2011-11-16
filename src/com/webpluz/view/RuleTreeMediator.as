@@ -1,7 +1,10 @@
 package com.webpluz.view
 {
+	import com.webpluz.event.ProjectConfigEvent;
 	import com.webpluz.model.ConfigModel;
 	import com.webpluz.vo.ProjectConfig;
+	
+	import flash.events.Event;
 	
 	import mx.collections.ArrayCollection;
 	import mx.controls.Tree;
@@ -14,8 +17,11 @@ package com.webpluz.view
 	{
 		public static const NAME:String = 'RuleTreeMediator';
 		
+		public static const CHANGE:String = 'mediator.ruleTree.change';
+		
 		public function RuleTreeMediator(viewComponent:Object=null){
 			super(NAME, viewComponent);
+			ruleTree.addEventListener(ProjectConfigEvent.CHANGE, onRuleChange);
 		}
 		
 		public function get ruleTree():Tree{
@@ -33,6 +39,11 @@ package com.webpluz.view
 					ruleTree.dataProvider = new ArrayCollection(notification.getBody() as Array);
 					break;
 			}
+		}
+		
+		private function onRuleChange(e:ProjectConfigEvent):void{
+			e.stopPropagation();
+			this.sendNotification(CHANGE, e.config);
 		}
 	}
 }

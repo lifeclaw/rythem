@@ -1,5 +1,6 @@
 package com.webpluz.service{
 	import com.webpluz.vo.RequestData;
+	import com.webpluz.vo.Rule;
 	
 	import flash.system.Capabilities;
 	import flash.utils.Proxy;
@@ -58,20 +59,19 @@ package com.webpluz.service{
 			var index:int;
 			switch(r.getPriority()){
 				case Rule.RULE_PRIORITY_LOW:
-					index = rulesLow.indexOf(r);
+					index = this.findRule(r, rulesLow);
 					if(index != -1) rulesLow.splice(index);
 					break;
 					
 				case Rule.RULE_PRIORITY_HIGH:
-					index = rulesHigh.indexOf(r);
+					index = this.findRule(r, rulesHigh);
 					if(index != -1) rulesHigh.splice(index);
 					break;
 				
 				case Rule.RULE_PRIORITY_NORMAL:
-					index = rulesNormal.indexOf(r);
+					index = this.findRule(r, rulesNormal);
 					if(index != -1) rulesNormal.splice(index);
 					break;
-				
 			}
 		}
 		public function getRule(requestData:RequestData):Rule{
@@ -97,6 +97,14 @@ package com.webpluz.service{
 				instance = new RuleManager();
 			}
 			return instance;
+		}
+		
+		private function findRule(r:Rule, array:Array):int{
+			var i:uint=0, ln:uint=array.length;
+			for(i; i<ln; i++){
+				if(r.isEqual(array[i])) return i;
+			}
+			return -1;
 		}
 	}
 }

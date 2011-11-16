@@ -7,7 +7,6 @@
 		<![CDATA[
 			import com.webpluz.event.ProjectConfigEvent;
 			import com.webpluz.vo.ProjectConfig;
-			import com.webpluz.vo.ReplaceRule;
 			
 			import flash.events.Event;
 			
@@ -24,7 +23,7 @@
 			//update user interface when data(project config) is changed
 			override public function set data(value:Object):void{
 				super.data = value;
-				var rules:ArrayCollection = new ArrayCollection(config.rulesArray);
+				var rules:ArrayCollection = new ArrayCollection(config.rules);
 				this.labelField.text = config.name;
 				this.enableField.selected = config.enable;
 				this.ruleGrid.dataProvider = rules;
@@ -39,7 +38,7 @@
 				e.stopPropagation();
 				this.ruleGrid.enabled = enableField.selected;
 				this.config.enable = enableField.selected;
-				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, this.config.rulesArray, true));
+				this.dispatchEvent(new ProjectConfigEvent(ProjectConfigEvent.CHANGE, config, this.config.rules, true));
 			}
 			
 			//dispatch change event when user enable/disable replace rule

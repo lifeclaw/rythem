@@ -2,7 +2,7 @@ package com.webpluz.model
 {
 	import com.jo2.filesystem.FileUtils;
 	import com.webpluz.vo.ProjectConfig;
-	import com.webpluz.vo.ReplaceRule;
+	import com.webpluz.vo.Rule;
 	
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -73,8 +73,8 @@ package com.webpluz.model
 			return this.config;
 		}
 		
-		public function matchRule(value:String):ReplaceRule{
-			var result:ReplaceRule;
+		public function matchRule(value:String):Rule{
+			var result:Rule;
 			this.config.some(
 				function(project:ProjectConfig, index:uint, all:Vector.<ProjectConfig>):Boolean{
 					if(project.enable){

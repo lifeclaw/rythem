@@ -5,10 +5,10 @@
 					clipAndEnableScrolling="true">
 	<fx:Script>
 		<![CDATA[
-			import com.webpluz.vo.ReplaceRule;
+			import com.webpluz.vo.Rule;
 			
-			public function get rule():ReplaceRule{
-				return data as ReplaceRule;
+			public function get rule():Rule{
+				return data as Rule;
 			}
 			
 			override public function prepare(hasBeenRecycled:Boolean):void {

@@ -3,19 +3,19 @@ package com.webpluz.vo{
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-	import com.webpluz.service.Rule;
 
 	public class ContentReplaceRule extends Rule{
 		
 		private var _file:File;
 		private var _replaceContent:String; // for cache
+		
 		private var _replaceUrl:String;
 		private var _urlRule:String;
 		
 		private var _isDirectoryRule:Boolean = false;
 		
-		public function ContentReplaceRule(urlRule:String,replaceUrl:String){
-			super(Rule.RULE_TYPE_REPLACE_CONTENT);
+		public function ContentReplaceRule(urlRule:String,replaceUrl:String, enbale:Boolean = true){
+			super(Rule.RULE_TYPE_REPLACE_CONTENT, RULE_PRIORITY_NORMAL, enbale);
 			this._replaceUrl = replaceUrl;
 			this._urlRule = urlRule;
 			
@@ -117,6 +117,25 @@ package com.webpluz.vo{
 			//}
 			
 			return result;
+		}
+		
+		public function get pattern():String{
+			return this._urlRule;
+		}
+		public function get replace():String{
+			return this._replaceUrl;
+		}
+		
+		override public function isEqual(anotherRule:*):Boolean{
+			if(anotherRule is ContentReplaceRule){
+				var r:ContentReplaceRule = anotherRule as ContentReplaceRule;
+				return (r.pattern == this.pattern && r.replace == this.replace);
+			}
+			return false;
+		}
+		
+		override public function toString():String{
+			return '{"enable":' + enable + ', "type":"content", "url":"' + pattern + '", "replace":"' + replace + '"}';
 		}
 		
 	}

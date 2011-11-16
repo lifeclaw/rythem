@@ -17,6 +17,7 @@ package com.webpluz.service{
 	import flash.utils.ByteArray;
 	import com.webpluz.vo.ContentReplaceRule;
 	import com.webpluz.vo.IpReplaceRule;
+	import com.webpluz.vo.Rule;
 	
 	[Event(name="PIPE_CONNECTED", type="com.webpluz.service.PipeEvent")]
 	[Event(name="PIPE_COMPLETE", type="com.webpluz.service.PipeEvent")]

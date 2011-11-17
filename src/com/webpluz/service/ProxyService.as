@@ -4,6 +4,8 @@ package com.webpluz.service{
 	import com.jo2.system.IProxyManager;
 	import com.jo2.system.ProxyConfig;
 	import com.jo2.system.ProxyManager;
+	import com.webpluz.task.RefreshSystemProxyTask;
+	import com.webpluz.task.SetAndRefreshSystemProxyTaskQueue;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
 	
@@ -61,7 +63,7 @@ package com.webpluz.service{
 			_pipeCount = 0;
 			
 			//get current system proxy setting first
-			this._proxyManager = ProxyManager.getProxyManager();
+			this._proxyManager = ProxyManager.getProxyManagerInstance();
 			if(this._proxyManager){
 				this._proxyManager.addEventListener(ProxyManagerEvent.QUERY_PROXY_SUCCESS, onQueryProxySuccess);
 				this._proxyManager.queryProxy();
@@ -142,8 +144,7 @@ package com.webpluz.service{
 				var proxyServer:URI = new URI(address + ':' + port);
 				var configs:ProxyConfig = new ProxyConfig();
 				configs.addProxyForProtocol(proxyServer, ProxyConfig.HTTP);
-				this._proxyManager.proxy = configs;
-				trace('[ProxyService] system proxy updated');
+				new SetAndRefreshSystemProxyTaskQueue().run(configs);
 			}
 		}
 		

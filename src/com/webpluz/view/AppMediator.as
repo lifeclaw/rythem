@@ -18,6 +18,7 @@ package com.webpluz.view
 		public static const NAME:String = 'AppMediator';
 		
 		public static const MAIN_TAB_CHANGE:String = 'mediator.app.mainTabChange';
+		public static const CLOSING:String = 'mediator.app.closing';
 		
 		public function AppMediator(viewComponent:Object)
 		{
@@ -30,18 +31,6 @@ package com.webpluz.view
 			return this.viewComponent as Rythem;
 		}
 		
-		protected function cleanup():void{
-			trace('[AppMediator] cleaning up ...');
-			//close proxy service
-			var proxyService:ProxyService = (facade.retrieveProxy(ProxyService.NAME) as ProxyService);
-			proxyService.close();
-			//restore proxy configurations
-			var pm:IProxyManager = ProxyManager.getProxyManager();
-			if(pm && proxyService.systemProxyConfig){
-				pm.proxy = proxyService.systemProxyConfig;
-			}
-		}
-		
 		protected function onTabChildChanged(e:Event):void{
 			this.sendNotification(MAIN_TAB_CHANGE, app);
 		}
@@ -50,7 +39,8 @@ package com.webpluz.view
 			e.preventDefault();
 			e.stopPropagation();
 			app.visible = false;
-			this.cleanup();
+			trace('[AppMediator] cleaning up ...');
+			this.sendNotification(CLOSING);
 			setTimeout(function():void{
 				trace('[AppMediator] exit');
 				NativeApplication.nativeApplication.exit();

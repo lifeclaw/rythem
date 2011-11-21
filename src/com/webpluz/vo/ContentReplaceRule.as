@@ -53,10 +53,27 @@ package com.webpluz.vo{
 			var noSuchFileError:String;
 			var contentLength:Number;
 			var contentOfUrl:String;
+			// TODO set this as member
+			var contentTypeMappings:Object = {
+				"html":"text/html",
+				"htm":"text/html",
+				"text":"text/plain",
+				"css":"text/css",
+				"js":"application/x-javascript",
+				"jpg":"image/jpeg",
+				"jpeg":"image/jpeg",
+				"gif":"image/gif",
+				"png":"image/png",
+				"bmp":"applicatoin/x-bmp",
+				"qzmin":"application/x-javascript"
+			};
+			var tmp2:Array = fileName.split(".");
+			var contentType:String = contentTypeMappings[tmp2[tmp2.length-1].toString().toLowerCase()] || "text/html";
 			if(_file.exists){
-				if(_isDirectoryRule){// directory
+				if(_isDirectoryRule){// directory match
 					var tmp:Array = requestData.path.split("/");
 					var fileName:String = tmp[tmp.length-1];
+					
 					_file = File.userDirectory.resolvePath(this._replaceUrl+fileName);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
@@ -64,25 +81,25 @@ package com.webpluz.vo{
 						fileStream.close();
 						contentLength = contentOfUrl.length;
 						_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
-							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
+							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\n"+contentType+"\r\n\r\n"
 							+contentOfUrl;
-					}else{
+					}else{// no such file...
 						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";
 						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 					}
 					
-				}else{
+				}else{// single match
 					fileStream.open(_file ,FileMode.READ);
 					contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
 					fileStream.close();
-					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 6)){
+					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 6)){// qzmin combine match
 						_replaceContent = this.readFileByMerge(contentOfUrl);
-					}else{
+					}else{// exact file match
 						_replaceContent = contentOfUrl;
 					}
 					contentLength = _replaceContent.length;
 					_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
-						+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: text/html\r\n\r\n"
+						+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 						+this._replaceContent;
 				}
 			}else{

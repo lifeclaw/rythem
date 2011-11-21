@@ -69,6 +69,7 @@ package com.webpluz.service{
 				this._proxyManager.queryProxy();
 				trace('[ProxyService] querying current proxy setting');
 			}
+			_instance = this;
 		}
 		private function onQueryProxySuccess(e:ProxyManagerEvent):void{
 			this._systemProxyConfig = this._proxyManager.proxy;

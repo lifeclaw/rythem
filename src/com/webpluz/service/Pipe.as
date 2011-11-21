@@ -350,25 +350,27 @@ package com.webpluz.service{
 		public function tearDown():void{
 			trace('teardown..');
 			_tearDowned = true;
-			if (this.requestSocket != null && this.requestSocket.connected){
+			if (this.requestSocket != null){
 				//trace('teardown..1');
 				this.requestSocket.removeEventListener(ProgressEvent.SOCKET_DATA, onRequestSocketData);
 				this.requestSocket.removeEventListener(Event.CLOSE, onRequestSocketClose);
-				
-				this.requestSocket.flush();
-				this.requestSocket.close();
+				if(this.requestSocket.connected){
+					this.requestSocket.flush();
+					this.requestSocket.close();
+				}
 			}
 			
-			if (this.responseSocket != null && this.responseSocket.connected){
+			if (this.responseSocket != null){
 				//trace('teardown..2');
 				this.responseSocket.removeEventListener(Event.CONNECT, onResponseSocketConnect);
 				this.responseSocket.removeEventListener(ProgressEvent.SOCKET_DATA, onResponseSocketData);
 				this.responseSocket.removeEventListener(Event.CLOSE, onResponseSocketClose);
 				this.responseSocket.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onResponseSocketIOError);
 				this.responseSocket.removeEventListener(IOErrorEvent.IO_ERROR, onResponseSocketIOError);
-				
-				this.responseSocket.flush();
-				this.responseSocket.close();
+				if(this.responseSocket.connected){
+					this.responseSocket.flush();
+					this.responseSocket.close();
+				}
 			}
 		}
 	}

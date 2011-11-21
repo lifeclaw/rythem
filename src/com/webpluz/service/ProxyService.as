@@ -188,6 +188,9 @@ package com.webpluz.service{
 				trace("remove pipe when CONNECT "+e2.pipeId);
 				var pipeToRemove:Pipe=event.target as Pipe;
 				trace("onPipeConnected before remove:"+this._pipes.length);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
 				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
 				trace("onPipeConnected after remove:"+this._pipes.length);
 				this.generateConnecttion();
@@ -202,7 +205,11 @@ package com.webpluz.service{
 			if(this.storePipe(e2)){
 				var pipeToRemove:Pipe=event.target as Pipe;
 				trace("before remove:"+this._pipes.length);
-				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
+				pipeToRemove.removeEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
+				var thePipe:Pipe = this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+				
 				trace("after remove:"+this._pipes.length);
 				this.generateConnecttion();
 			}

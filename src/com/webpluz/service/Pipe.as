@@ -274,7 +274,7 @@ package com.webpluz.service{
 					trace("1 too long:m="+m);
 				}
 				headerTest+=response.readUTFBytes(1);
-				bodyPosition = headerTest.search(SEPERATOR)
+				bodyPosition = headerTest.search(SEPERATOR);
 				if (bodyPosition != -1){
 					bodyPosition += 4
 					break;

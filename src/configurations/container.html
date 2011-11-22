@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+"use strict";
+var callbacks = {
+	updatePipeList:function(params){
+	
+	},
+	updateInspector:function(params){
+		
+	},
+	hello:function(params){
+		return 'add in web | orient msg='+params;
+	}
+
+};
+
+function handleMessageFromClient(msgType,params){
+	var func = window.callbacks[msgType];
+	if(func && func.call){
+		return func(params);
+	}else{
+		alert('no such handler for'+msgType);
+	}
+}
+function sendMessageToClient(msgType,params){
+	if(window.notify) window.notify(msgType,params);
+}
+
+function $(id){return document.getElementById(id);}
+
+</script>
+<script>
+window.onload=function(){
+	sendMessageToClient("window-ready");
+	var k = new DataGrid($('pipeList'),[ 
+		{name:'#',className:'index'},
+		{name:'host',className:'host'},
+		{name:'others..',className:'others'}
+	]);
+	var l = new DataGrid($('ruleList'),[ 
+		{name:'#',className:'index'},
+		{name:'host',className:'host'},
+		{name:'others..',className:'others'}
+	]);
+	
+	l.addItems([
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
+		[3,4,5],
+		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"]
+	]);
+	k.addItem([3,'3434','324324234']);
+	
+}
+</script>
+<script type="text/javascript">
+"use strict";
+window.onerror=function(msg,line){alert(msg+line);}
+if(!window.console){window.console={info:function(){}};}
+// DataGrid
+//(function(){
+
+// begin of resize
+// resize relate closure variables
+var tmpEl;
+var startX;
+var startWidth;
+// resize relate functions
+function onHeaderMouseMove(e){
+	var offsetX = e.pageX - startX;
+	tmpEl.style['width']=startWidth + offsetX + 'px';
+}
+function onHeaderMouseDown(e){
+	//console.info(e.target.parentNode);
+	var column = e.target.parentNode.parentNode;
+	startX = e.pageX;
+	startY = e.pageY;
+	tmpEl = column;
+	startWidth = Number(window.getComputedStyle(column,null).width.split('px')[0]);
+	document.addEventListener("mousemove",onHeaderMouseMove);
+	document.addEventListener("mouseup",onHeaderMouseUp);
+	// prevent select
+	document.addEventListener('selectstart',preventDefaultAndStopPropagation,true);
+}
+function preventDefaultAndStopPropagation(e){e.preventDefault();e.stopPropagation();}
+function onHeaderMouseUp(){
+	document.removeEventListener("mouseup",onHeaderMouseUp);
+	document.removeEventListener("mousemove",onHeaderMouseMove);
+	
+	document.removeEventListener('selectstart',preventDefaultAndStopPropagation,true);
+}
+// end of resize
+
+
+
+
+var DataGrid = function(el,headers){
+	this.container = el;
+	this.container.dg=this;
+	if(!el.className || el.className.indexOf('dg-container') ==-1){
+		el.className = el.className?el.className+' dg-container':'dg-container';
+	}
+	var tmpHtml = '';
+	for(var i=0,l=headers.length;i<l;++i){
+		var header = headers[i];
+		tmpHtml+='<ul class="dg-column';
+		if(header.className){
+			//console.info(header.className);
+			tmpHtml+=' '+header.className;
+		}
+		tmpHtml+='"><li class="dg-header"><span class="dg-resize-holder"></span><span style="float:left">'+header.name+'</span></li></ul>'; 
+	}
+	//console.info(tmpHtml);
+	this.container.innerHTML = tmpHtml;
+	this.columns = this.container.getElementsByClassName('dg-column');
+	var holders = this.container.getElementsByClassName('dg-resize-holder');
+	for(var i=0,l=holders.length;i<l;++i){
+		//console.info(holders[i]);
+		holders[i].addEventListener('mousedown',onHeaderMouseDown)
+	}
+	
+	var that = this;
+	this.container.addEventListener('mouseover',function(e){
+		that.onItemMouseOver.call(that,e);
+	});
+}
+
+DataGrid.prototype  = {
+	addItem:function(item,topFragments){
+		var l = this.columns.length;
+		for(var i=0;i<l;++i){
+			var row = document.createElement('li');
+			row.className = 'dg-item';
+			row.innerHTML = item[i]; //TODO escape
+			if(topFragments){
+				topFragments[i].appendChild(row);
+			}else{
+				this.columns[i].appendChild(row);	
+			}
+		}
+	},
+	addItems:function(items){
+		var fragments = [];
+		for(var i=0,l=this.columns.length;i<l;++i){
+			fragments.push(document.createDocumentFragment());
+		}
+		for(var i=0,l=items.length;i<l;++i){
+			this.addItem(items[i],fragments);
+		}
+		for(var i=0,l=this.columns.length;i<l;++i){
+			this.columns[i].appendChild(fragments[i]);
+		}
+	},
+	removeItem:function(params){
+	
+	},
+	updateItem:function(params){
+	
+	},
+	
+	onItemMouseOver: function(e,thisObj){
+		//console.info(arguments);
+		var t = e.target;
+		if(!t)return;
+		while(t && t.className!='dg-container' && (t.tagName!='LI' || t.className=='dg-column')){
+			t = t.parentNode;
+		}
+		if(t.className != 'dg-item'){
+			return;
+		}
+		t.style['background']="rgba(3,32,42,0.3)";
+		var n = Array.prototype.indexOf.call(t.parentNode.children,t);
+		if(n == this.lastHoverIndex)return;
+		this.cancelLastHover();
+		this.lastHoverIndex = n;
+		this.renderHover();
+		//var i = t.indexOf(t.parentNode.children);
+	},
+	cancelLastHover:function(){
+		if(this.lastHoverIndex == undefined)return;
+		//console.info('cancelLastHover'+this.columns,this.lastHoverIndex);
+		for(var i=0,l=this.columns.length;i<l;++i){
+			//console.info(this.columns[i].children[this.lastHoverIndex]);
+			this.columns[i].children[this.lastHoverIndex].style['background']='';
+		}
+	},
+	renderHover:function(i){
+		//console.info('renderHover'+this.columns,this.lastHoverIndex);
+		for(var i=0,l=this.columns.length;i<l;++i){
+			this.columns[i].children[this.lastHoverIndex].style['backgroundColor']='rgba(3,23,43,.3)';
+		}
+	}
+
+};
+window.DataGrid = DataGrid;
+//}());
+</script>
+
+<style>
+* {
+	padding:0;
+	margin:0
+}
+ul, li {
+	list-style:none;
+}
+.dg-container {
+	border:solid 1px #0F3;
+	overflow:auto;
+	display:-webkit-box;
+	-webkit-box-orient:horizontal;
+}
+.dg-column {
+	min-height:80px;
+	text-overflow:ellipsis;
+}
+.dg-header {
+	/*resize:horizontal;*/
+	overflow:hidden;
+	border:solid 1px green
+}
+.dg-resize-holder {
+	float:right;
+	width:4px;
+	height:20px;
+ background:rgba(0,204,153,0.1)  z-index:100;
+	float:right;
+}
+.dg-resize-holder:hover {
+	cursor:move;
+}
+.dg-item {
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+</style>
+<style>
+.index {
+	width:80px;
+}
+.host {
+	width:100px;
+}
+
+#ruleList{
+	height:300px;
+	position:absolute;
+	left:300px;
+	top:100px;
+	width:500px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="test">test..</div>
+
+<div id="pipeList">
+
+</div>
+<div id="ruleList">
+
+</div>
+</body>
+</html>

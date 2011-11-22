@@ -23,8 +23,11 @@ package com.webpluz.view
 		public function AppMediator(viewComponent:Object)
 		{
 			super(NAME, viewComponent);
+			app.webContainer.htmlLoader.window.airCall = function(type:String,param:Object){
+					
+			}
 			app.addEventListener(Event.CLOSING, onAppClosing);
-			app.mainTabNavigator.addEventListener(Event.CHANGE, onTabChildChanged);
+			//app.mainTabNavigator.addEventListener(Event.CHANGE, onTabChildChanged);
 		}
 		
 		public function get app():Rythem{

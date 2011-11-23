@@ -85,7 +85,7 @@ package com.webpluz.vo{
 							+contentOfUrl;
 					}else{// no such file...
 						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";
-						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
+						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html\r\nContent-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 					}
 					
 				}else{// single match

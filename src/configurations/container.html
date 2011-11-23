@@ -4,6 +4,11 @@
 <script>
 "use strict";
 var callbacks = {
+	'addPipeListItem':function(item){
+		var itemArray = [];
+		for(var i in item){itemArray.push(item[i]);}
+		pipeList.addItem(itemArray);
+	},
 	updatePipeList:function(params){
 	
 	},
@@ -32,79 +37,52 @@ function $(id){return document.getElementById(id);}
 
 </script>
 <script>
+var pipeList;
 window.onload=function(){
 	sendMessageToClient("window-ready");
-	var k = new DataGrid($('pipeList'),[ 
+	pipeList = new DataGrid($('pipeList'),[ 
 		{name:'#',className:'index'},
+		{name:'result',className:'result'},
 		{name:'host',className:'host'},
+		{name:'serverIp',className:'serverIp'},
+		{name:'path',className:'path'},
 		{name:'others..',className:'others'}
 	]);
-	var l = new DataGrid($('ruleList'),[ 
-		{name:'#',className:'index'},
-		{name:'host',className:'host'},
-		{name:'others..',className:'others'}
-	]);
-	
-	l.addItems([
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"],
-		[3,4,5],
-		[3,64,"354adfasdfasdfasdfasd5sadfasdfasdfadsfasdfasdfasdf"]
-	]);
-	k.addItem([3,'3434','324324234']);
 	
 }
 </script>
 <script type="text/javascript">
 "use strict";
-window.onerror=function(msg,line){alert(msg+line);}
 if(!window.console){window.console={info:function(){}};}
 // DataGrid
 //(function(){
 
 // begin of resize
 // resize relate closure variables
-var tmpEl;
+var currentResizeHeaderEl;
+var currentResizeColumn;
 var startX;
 var startWidth;
 // resize relate functions
 function onHeaderMouseMove(e){
 	var offsetX = e.pageX - startX;
-	tmpEl.style['width']=startWidth + offsetX + 'px';
+	currentResizeHeaderEl.style['width']=startWidth + offsetX + 'px';
+	resizeColumn(currentResizeHeaderEl);
+	
+}
+function resizeColumn(header){
+	var columns = header.parentNode.parentNode.getElementsByClassName('dg-column');
+	//console.info(columns);
+	var index=Array.prototype.indexOf.call(header.parentNode.children,header);
+	//console.info(columns[index]);
+	columns[index].style['width']=window.getComputedStyle(header,null).width;
 }
 function onHeaderMouseDown(e){
 	//console.info(e.target.parentNode);
-	var column = e.target.parentNode.parentNode;
+	var column = e.target.parentNode;
 	startX = e.pageX;
-	startY = e.pageY;
-	tmpEl = column;
-	startWidth = Number(window.getComputedStyle(column,null).width.split('px')[0]);
+	currentResizeHeaderEl = column;
+	startWidth = Number(window.getComputedStyle(currentResizeHeaderEl,null).width.split('px')[0]);
 	document.addEventListener("mousemove",onHeaderMouseMove);
 	document.addEventListener("mouseup",onHeaderMouseUp);
 	// prevent select
@@ -128,22 +106,26 @@ var DataGrid = function(el,headers){
 	if(!el.className || el.className.indexOf('dg-container') ==-1){
 		el.className = el.className?el.className+' dg-container':'dg-container';
 	}
-	var tmpHtml = '';
+	var tmpHeaderHtml='<div class="dg-header-container">';
+	var tmpHtml = '<div class="dg-list-container">';
 	for(var i=0,l=headers.length;i<l;++i){
 		var header = headers[i];
-		tmpHtml+='<ul class="dg-column';
+		var className = '';
 		if(header.className){
-			//console.info(header.className);
-			tmpHtml+=' '+header.className;
+			className = ' '+header.className;
 		}
-		tmpHtml+='"><li class="dg-header"><span class="dg-resize-holder"></span><span style="float:left">'+header.name+'</span></li></ul>'; 
+		tmpHeaderHtml += '<div class="dg-header'+ className +'"><span class="dg-resize-holder"></span><span style="float:left">'+header.name+'</span></div>';
+		tmpHtml+='<ul class="dg-column'+className+'"></ul>';
 	}
+	tmpHtml+='</div>';
+	tmpHeaderHtml += '</div>';
 	//console.info(tmpHtml);
-	this.container.innerHTML = tmpHtml;
+	this.container.innerHTML =tmpHeaderHtml +  tmpHtml;
 	this.columns = this.container.getElementsByClassName('dg-column');
 	var holders = this.container.getElementsByClassName('dg-resize-holder');
 	for(var i=0,l=holders.length;i<l;++i){
 		//console.info(holders[i]);
+		resizeColumn(holders[i].parentNode);
 		holders[i].addEventListener('mousedown',onHeaderMouseDown)
 	}
 	
@@ -236,11 +218,19 @@ ul, li {
 	border:solid 1px #0F3;
 	overflow:auto;
 	display:-webkit-box;
+	-webkit-box-orient:vertical;
+}
+.dg-list-container{
+	display:-webkit-box;
 	-webkit-box-orient:horizontal;
 }
 .dg-column {
 	min-height:80px;
 	text-overflow:ellipsis;
+}
+.dg-header-container{
+	display:-webkit-box;
+	-webkit-box-orient:horizontal;
 }
 .dg-header {
 	/*resize:horizontal;*/
@@ -267,7 +257,7 @@ ul, li {
 	width:80px;
 }
 .host {
-	width:100px;
+	width:300px;
 }
 
 #ruleList{

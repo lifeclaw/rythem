@@ -93,7 +93,7 @@
 					<s:GridColumn width="50" dataField="enable" itemRenderer="com.webpluz.view.RuleEnableItemRenderer"></s:GridColumn>
 					<s:GridColumn width="50" dataField="type" headerText="type"></s:GridColumn>
 					<s:GridColumn dataField="pattern" headerText="pattern" itemEditor="com.webpluz.view.RuleTextInputItemEditor"></s:GridColumn>
-					<s:GridColumn dataField="replace" headerText="replace" itemEditor="com.webpluz.view.RuleTextInputItemEditor"></s:GridColumn>
+					<s:GridColumn dataField="replace" headerText="replace" itemEditor="com.webpluz.view.RuleReplaceItemEditor"></s:GridColumn>
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>

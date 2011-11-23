@@ -30,6 +30,7 @@ package com.webpluz.command
 				if(enable) ruleManager.addRule(changeRule);
 				else ruleManager.removeRule(changeRule);
 			});
+			trace('[RuleManager]', ruleManager);
 		}
 	}
 }

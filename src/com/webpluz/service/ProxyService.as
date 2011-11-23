@@ -68,7 +68,7 @@ package com.webpluz.service{
 			_instance = this;
 		}
 		private function onSystemProxyBackuped(e:Event):void{
-			this._systemProxyConfig = this._proxyManager.proxyConfig.copy();
+			this._systemProxyConfig = this._proxyManager.proxy.copy();
 			if(this._address) this.updateSystemProxy(_address, _port);
 		}
 		public static function getInstance(bindAddress:String="", bindPort:Number=0):ProxyService{

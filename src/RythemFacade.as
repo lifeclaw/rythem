@@ -34,10 +34,11 @@ package
 		
 		override protected function initializeController():void{
 			super.initializeController();
-			this.registerCommand(STARTUP, StartupCommand);
-			this.registerCommand(AppMediator.MAIN_TAB_CHANGE, MainTabNavigatorChangeCommand);
-			this.registerCommand(AppMediator.CLOSING, CleanupBeforeCloseCommand);
-			this.registerCommand(RuleTreeMediator.CHANGE, ProjectConfigChangeCommand);
+			this.registerCommand(STARTUP, 						StartupCommand);
+			this.registerCommand(ConfigModel.UPDATE, 			ConfigModelUpdateCommand);
+			this.registerCommand(AppMediator.MAIN_TAB_CHANGE, 	MainTabNavigatorChangeCommand);
+			this.registerCommand(AppMediator.CLOSING, 			CleanupBeforeCloseCommand);
+			this.registerCommand(RuleTreeMediator.CHANGE, 		ProjectConfigChangeCommand);
 		}
 		
 		override protected function initializeModel():void{

@@ -52,8 +52,12 @@ package com.webpluz.vo{
 			return false;
 		}
 		
+		public function toJSON(k:String):*{
+			return {type:type, priority:priority};
+		}
+		
 		public function toString():String{
-			return '{}';
+			return JSON.stringify(this);
 		}
 	}
 }

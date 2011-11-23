@@ -1,10 +1,10 @@
 package com.webpluz.service{
+	import com.webpluz.vo.ContentReplaceRule;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.Rule;
 	
 	import flash.system.Capabilities;
 	import flash.utils.Proxy;
-	import com.webpluz.vo.ContentReplaceRule;
 
 	public class RuleManager extends Proxy{
 		protected static var instance:RuleManager=null;
@@ -45,21 +45,26 @@ package com.webpluz.service{
 			*/
 		}
 		public function addRule(r:Rule):void{
-			trace('adding rule:'+r.getType());
+			trace('adding rule: ' + r.type);
+			var index:int;
 			switch(r.getPriority()){
 				case Rule.RULE_PRIORITY_LOW:
-					rulesLow.push(r);
+					index = this.findRule(r, rulesLow);
+					if(index == -1) rulesLow.push(r);
 					break;
 				case Rule.RULE_PRIORITY_HIGH:
-					rulesHigh.push(r);
+					index = this.findRule(r, rulesHigh);
+					if(index == -1) rulesHigh.push(r);
 					break;
 				case Rule.RULE_PRIORITY_NORMAL:
 				default:
-					rulesNormal.push(r);
+					index = this.findRule(r, rulesNormal);
+					if(index == -1) rulesNormal.push(r);
 					break;
 			}
 		}
 		public function removeRule(r:Rule):void{
+			trace('removing rule: ' + r.type);
 			var index:int;
 			switch(r.getPriority()){
 				case Rule.RULE_PRIORITY_LOW:
@@ -109,6 +114,18 @@ package com.webpluz.service{
 				if(r.isEqual(array[i])) return i;
 			}
 			return -1;
+		}
+		
+		public function toJSON(k:String):*{
+			return {
+				low: 	rulesLow,
+				normal: rulesNormal,
+				high: 	rulesHigh
+			};
+		}
+		
+		public function toString():String{
+			return JSON.stringify(this, null, 4);
 		}
 	}
 }

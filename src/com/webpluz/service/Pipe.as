@@ -1,7 +1,6 @@
 // from http://httpeek.googlecode.com/
 package com.webpluz.service{
 	import com.jo2.net.URI;
-	import com.jo2.system.ProxyConfig;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
 	
@@ -150,6 +149,7 @@ package com.webpluz.service{
 
 					//if proxy is needed here, create a ProxySocket rather than a normal Socket
 					if(this._proxy){
+						trace('RESPONSE SOCKET AS PROXY SOCKET', _proxy);
 						this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
 					}
 					else{

@@ -1,9 +1,6 @@
 package com.webpluz.view
 {
 	import com.adobe.net.URI;
-	import com.jo2.system.IProxyManager;
-	import com.jo2.system.ProxyConfig;
-	import com.jo2.system.ProxyManager;
 	import com.webpluz.service.ProxyService;
 	
 	import flash.desktop.NativeApplication;

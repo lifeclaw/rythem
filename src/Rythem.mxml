@@ -8,9 +8,6 @@
 	<fx:Style source="Rythem.css"/>
 	<fx:Script>
 		<![CDATA[
-			import com.jo2.system.ProxyConfig;
-			import com.jo2.system.ProxyManager;
-			
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			

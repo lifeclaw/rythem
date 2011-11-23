@@ -1,9 +1,8 @@
 package com.webpluz.command
 {
-	import com.jo2.system.IProxyManager;
-	import com.jo2.system.ProxyManager;
+	import com.jo2.net.IProxyManager;
+	import com.jo2.net.ProxyManager;
 	import com.webpluz.service.ProxyService;
-	import com.webpluz.task.SetAndRefreshSystemProxyTaskQueue;
 	
 	import org.puremvc.as3.interfaces.ICommand;
 	import org.puremvc.as3.interfaces.INotification;
@@ -21,7 +20,7 @@ package com.webpluz.command
 			var proxyService:ProxyService = (facade.retrieveProxy(ProxyService.NAME) as ProxyService);
 			proxyService.close();
 			//restore proxy configurations
-			new SetAndRefreshSystemProxyTaskQueue().run(proxyService.systemProxyConfig);
+			ProxyManager.newInstance().restoreSystemProxyConfig();
 		}
 	}
 }

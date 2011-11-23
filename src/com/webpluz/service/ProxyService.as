@@ -1,11 +1,8 @@
 package com.webpluz.service{
-	import com.jo2.event.ProxyManagerEvent;
+	import com.jo2.net.IProxyManager;
+	import com.jo2.net.ProxyConfig;
+	import com.jo2.net.ProxyManager;
 	import com.jo2.net.URI;
-	import com.jo2.system.IProxyManager;
-	import com.jo2.system.ProxyConfig;
-	import com.jo2.system.ProxyManager;
-	import com.webpluz.task.RefreshSystemProxyTask;
-	import com.webpluz.task.SetAndRefreshSystemProxyTaskQueue;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
 	
@@ -62,18 +59,16 @@ package com.webpluz.service{
 			this._serverSocket.addEventListener(Event.CONNECT, this.onConnect);
 			_pipeCount = 0;
 			
-			//get current system proxy setting first
-			this._proxyManager = ProxyManager.getProxyManagerInstance();
+			//backup current system proxy setting first
+			this._proxyManager = ProxyManager.newInstance();
 			if(this._proxyManager){
-				this._proxyManager.addEventListener(ProxyManagerEvent.QUERY_PROXY_SUCCESS, onQueryProxySuccess);
-				this._proxyManager.queryProxy();
-				trace('[ProxyService] querying current proxy setting');
+				this._proxyManager.addEventListener(Event.COMPLETE, onSystemProxyBackuped);
+				this._proxyManager.backupSystemProxyConfig()
 			}
 			_instance = this;
 		}
-		private function onQueryProxySuccess(e:ProxyManagerEvent):void{
-			this._systemProxyConfig = this._proxyManager.proxy;
-			trace('[ProxyService] system proxy config is saved');
+		private function onSystemProxyBackuped(e:Event):void{
+			this._systemProxyConfig = this._proxyManager.proxyConfig.copy();
 			if(this._address) this.updateSystemProxy(_address, _port);
 		}
 		public static function getInstance(bindAddress:String="", bindPort:Number=0):ProxyService{
@@ -141,11 +136,8 @@ package com.webpluz.service{
 		}
 		//automaticlly set system proxy to this proxy service
 		private function updateSystemProxy(address:String, port:Number):void{
-			if(this._proxyManager && !this._proxyManager.executing){
-				var proxyServer:URI = new URI(address + ':' + port);
-				var configs:ProxyConfig = new ProxyConfig();
-				configs.addProxyForProtocol(proxyServer, ProxyConfig.HTTP);
-				new SetAndRefreshSystemProxyTaskQueue().run(configs);
+			if(this._proxyManager && !this._proxyManager.running){
+				this._proxyManager.setProxy('http=' + address + ':' + port);
 			}
 		}
 		
@@ -175,7 +167,7 @@ package com.webpluz.service{
 			//}
 			this.generateConnecttion();
 			*/
-			var proxy:URI = this._systemProxyConfig ? this._systemProxyConfig.server : null;
+			var proxy:URI = this._systemProxyConfig ? this._systemProxyConfig.serverURI : null;
 			var pipe:Pipe=new Pipe(e.socket,_pipeCount++, proxy);
 			//_pipeCount++;
 			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);

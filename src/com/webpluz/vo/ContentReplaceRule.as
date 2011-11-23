@@ -67,12 +67,12 @@ package com.webpluz.vo{
 				"bmp":"applicatoin/x-bmp",
 				"qzmin":"application/x-javascript"
 			};
+			var tmp:Array = requestData.path.split("/");
+			var fileName:String = tmp[tmp.length-1];
 			var tmp2:Array = fileName.split(".");
 			var contentType:String = contentTypeMappings[tmp2[tmp2.length-1].toString().toLowerCase()] || "text/html";
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
-					var tmp:Array = requestData.path.split("/");
-					var fileName:String = tmp[tmp.length-1];
 					
 					_file = File.userDirectory.resolvePath(this._replaceUrl+fileName);
 					if(_file.exists){

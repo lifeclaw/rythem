@@ -45,6 +45,7 @@ package com.webpluz.service{
 			*/
 		}
 		public function addRule(r:Rule):void{
+			trace('adding rule:'+r.getType());
 			switch(r.getPriority()){
 				case Rule.RULE_PRIORITY_LOW:
 					rulesLow.push(r);

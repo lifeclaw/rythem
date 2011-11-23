@@ -150,6 +150,7 @@ package com.webpluz.service{
 		}
 		
 		private function generateConnecttion():void{
+			/*
 			while(true || this._pipes.length <2){//TODO 
 				if(this._waitingSockets.length==0){
 					break;
@@ -164,13 +165,23 @@ package com.webpluz.service{
 				trace("socket connections:"+this._pipes.length);
 			}
 			trace("generateConnection end"+this._pipes.length+"  "+this._waitingSockets.length);
+			*/
 		}
 		private function onConnect(e:ServerSocketConnectEvent):void{
+			/*
 			//if(this._pipes.length >=10){
 			this._waitingSockets.push(e.socket);
 			//	return;
 			//}
 			this.generateConnecttion();
+			*/
+			var proxy:URI = this._systemProxyConfig ? this._systemProxyConfig.server : null;
+			var pipe:Pipe=new Pipe(e.socket,_pipeCount++, proxy);
+			//_pipeCount++;
+			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
+			pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
+			pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
+			this._pipes.push(pipe);
 		}
 		
 		protected function onPipeError(event:PipeEvent):void{

@@ -208,7 +208,7 @@ package com.webpluz.service{
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
-				var thePipe:Pipe = this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
+				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
 				
 				trace("after remove:"+this._pipes.length);
 				this.generateConnecttion();

@@ -151,6 +151,10 @@ package com.webpluz.vo{
 			return this._urlRule;
 		}
 		public function set pattern(value:String):void{
+			if(this._urlRule == value){
+				return;
+			}
+			this._replaceContent = '';
 			this._urlRule = value;
 			if(this._urlRule.charAt(this._urlRule.length-1) == '/'){
 				this._isDirectoryRule = true;
@@ -160,7 +164,10 @@ package com.webpluz.vo{
 			return this._replaceUrl;
 		}
 		public function set replace(value:String):void{
-			this._replaceUrl = value;
+			if(this._replaceUrl != value){
+				this._replaceContent = '';
+				this._replaceUrl = value;
+			}
 		}
 		
 		override public function isEqual(anotherRule:*):Boolean{

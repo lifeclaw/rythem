@@ -26,15 +26,22 @@ package com.webpluz.vo{
 			// only exactly match
 			// trace(this._urlRule,requestData.fullUrl);
 			
-			if(this._isDirectoryRule){// direcory rule,request must no end with "/"
-				if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
-					if(requestData.path.indexOf(this._urlRule) == (requestData.path.lastIndexOf('/') - this._urlRule.length +1)){
+			if(this._isDirectoryRule){
+				/*
+				 *  rule:  http://a.b.c/d/    => d:/dsite/
+				 *  rule:  /e/f/g/            => d:/anysite/efg/
+				 *  rule:  a.b.c/d/           => 
+				 *    any rule above without '/'
+				 */
+				//if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
+					var isPatternHasEnd:Boolean = this._urlRule.lastIndexOf("/") == this._urlRule.length -1;
+					if(requestData.fullUrl.indexOf(this._urlRule) == (requestData.fullUrl.lastIndexOf('/') - this._urlRule.length +(isPatternHasEnd?1:0))){
 						return true;
 					}
 					return false;
-				}else{
-					return false;
-				}
+				//}else{
+				//	return false;
+				//}
 			}else{
 				return (this._urlRule.indexOf(requestData.fullUrl) == 0);
 			}
@@ -73,8 +80,8 @@ package com.webpluz.vo{
 			var contentType:String = contentTypeMappings[tmp2[tmp2.length-1].toString().toLowerCase()] || "text/html";
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
-					
-					_file = File.userDirectory.resolvePath(this._replaceUrl+fileName);
+					//TODO test in windows
+					_file = File.userDirectory.resolvePath(this._replaceUrl+(_replaceUrl.charAt(_replaceUrl.length-1)=='/'?'':'/')+fileName);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
 						contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);

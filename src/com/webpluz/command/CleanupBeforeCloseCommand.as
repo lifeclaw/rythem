@@ -20,7 +20,12 @@ package com.webpluz.command
 			var proxyService:ProxyService = (facade.retrieveProxy(ProxyService.NAME) as ProxyService);
 			proxyService.close();
 			//restore proxy configurations
-			ProxyManager.newInstance().restoreSystemProxyConfig();
+			if(ProxyManager && ProxyManager.newInstance()){
+				ProxyManager.newInstance().restoreSystemProxyConfig();
+			}else{
+				//TODO..
+				trace('error here OSCAR have a look');
+			}
 		}
 	}
 }

@@ -20,14 +20,18 @@
 				textInput.setFocus();
 			}
 			
-			protected function button1_clickHandler(event:MouseEvent):void{
+			protected function dirClickHandler(event:MouseEvent):void{
 				file.browseForDirectory("select a directory");
-				//TODO
+				file.addEventListener(Event.SELECT,dirSelected);
+			}
+			protected function filelickHandler(event:MouseEvent):void{
+				file.browseForOpen("select a file");
 				file.addEventListener(Event.SELECT,dirSelected);
 			}
 			
 			protected function dirSelected(event:Event):void{
 				this.value = event.target.nativePath;
+				this.save();
 			}
 			
 		]]>
@@ -35,6 +39,7 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:TextInput id="textInput" left="0" top="0" bottom="0" right="50"/>
-	<s:Button click="button1_clickHandler(event)" width="50" right="0" top="0" bottom="0" label="&gt;"/>
+	<s:TextInput id="textInput" left="0" top="0" bottom="0" right="100"/>
+	<s:Button click="dirClickHandler(event)" width="50" right="0" top="0" bottom="0" label="Dir"/>
+	<s:Button click="filelickHandler(event)" width="50" right="50" top="0" bottom="0" label="File"/>
 </s:GridItemEditor>

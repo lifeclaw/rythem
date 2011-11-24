@@ -156,9 +156,7 @@ package com.webpluz.vo{
 			}
 			this._replaceContent = '';
 			this._urlRule = value;
-			if(this._urlRule.charAt(this._urlRule.length-1) == '/'){
-				this._isDirectoryRule = true;
-			}
+			
 		}
 		public function get replace():String{
 			return this._replaceUrl;
@@ -167,6 +165,12 @@ package com.webpluz.vo{
 			if(this._replaceUrl != value){
 				this._replaceContent = '';
 				this._replaceUrl = value;
+				var tmpFile:File = File.userDirectory.resolvePath(value);
+				if(tmpFile.exists){
+					this._isDirectoryRule = tmpFile.isDirectory;
+				}else{
+					// TODO need to warn user?
+				}
 			}
 		}
 		

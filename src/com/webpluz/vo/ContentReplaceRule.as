@@ -81,7 +81,8 @@ package com.webpluz.vo{
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
 					//TODO test in windows
-					_file = File.userDirectory.resolvePath(this._replaceUrl+(_replaceUrl.charAt(_replaceUrl.length-1)=='/'?'':'/')+fileName);
+					var filePath:String = this._replaceUrl+(_replaceUrl.charAt(_replaceUrl.length-1)=='/'?'':'/')+fileName;
+					_file = File.userDirectory.resolvePath(filePath);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
 						contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
@@ -91,7 +92,7 @@ package com.webpluz.vo{
 							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 							+contentOfUrl;
 					}else{// no such file...
-						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";
+						noSuchFileError = "Rythem cannot resolve this path["+filePath+"] Directory Rule";
 						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html\r\nContent-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 					}
 					

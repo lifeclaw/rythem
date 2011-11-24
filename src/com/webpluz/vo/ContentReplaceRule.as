@@ -88,7 +88,7 @@ package com.webpluz.vo{
 						fileStream.close();
 						contentLength = contentOfUrl.length;
 						_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
-							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\n"+contentType+"\r\n\r\n"
+							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 							+contentOfUrl;
 					}else{// no such file...
 						noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+fileName+"] Directory Rule";

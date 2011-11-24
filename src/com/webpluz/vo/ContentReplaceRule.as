@@ -10,8 +10,8 @@ package com.webpluz.vo{
 		private var _file:File;
 		private var _replaceContent:String; // for cache
 		
-		private var _replaceUrl:String;
-		private var _urlRule:String;
+		private var _replace:String;
+		private var _pattern:String;
 		
 		private var _isDirectoryRule:Boolean = false;
 		
@@ -34,8 +34,8 @@ package com.webpluz.vo{
 				 *    any rule above without '/'
 				 */
 				//if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
-					var isPatternHasEnd:Boolean = this._urlRule.lastIndexOf("/") == this._urlRule.length -1;
-					if(requestData.fullUrl.indexOf(this._urlRule) == (requestData.fullUrl.lastIndexOf('/') - this._urlRule.length +(isPatternHasEnd?1:0))){
+					var isPatternHasEnd:Boolean = this._pattern.lastIndexOf("/") == this._pattern.length -1;
+					if(requestData.fullUrl.indexOf(this._pattern) == (requestData.fullUrl.lastIndexOf('/') - this._pattern.length +(isPatternHasEnd?1:0))){
 						return true;
 					}
 					return false;
@@ -43,7 +43,7 @@ package com.webpluz.vo{
 				//	return false;
 				//}
 			}else{
-				return (this._urlRule.indexOf(requestData.fullUrl) == 0);
+				return (this._pattern.indexOf(requestData.fullUrl) == 0);
 			}
 		}
 		public function getContent(requestData:RequestData=null):String{
@@ -55,7 +55,7 @@ package com.webpluz.vo{
 		}
 		
 		private function readFile(requestData:RequestData=null):String{
-			_file = File.userDirectory.resolvePath(this._replaceUrl);
+			_file = File.userDirectory.resolvePath(this._replace);
 			var fileStream:FileStream = new FileStream();
 			var noSuchFileError:String;
 			var contentLength:Number;
@@ -81,7 +81,7 @@ package com.webpluz.vo{
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
 					//TODO test in windows
-					var filePath:String = this._replaceUrl+(_replaceUrl.charAt(_replaceUrl.length-1)=='/'?'':'/')+fileName;
+					var filePath:String = this._replace+(_replace.charAt(_replace.length-1)=='/'?'':'/')+fileName;
 					_file = File.userDirectory.resolvePath(filePath);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
@@ -100,7 +100,7 @@ package com.webpluz.vo{
 					fileStream.open(_file ,FileMode.READ);
 					contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
 					fileStream.close();
-					if(this._replaceUrl.indexOf(".qzmin")==(this._replaceUrl.length - 6)){// qzmin combine match
+					if(this._replace.indexOf(".qzmin")==(this._replace.length - 6)){// qzmin combine match
 						_replaceContent = this.readFileByMerge(contentOfUrl);
 					}else{// exact file match
 						_replaceContent = contentOfUrl;
@@ -111,7 +111,7 @@ package com.webpluz.vo{
 						+this._replaceContent;
 				}
 			}else{
-				noSuchFileError = "Rythem cannot resolve this path["+this._replaceUrl+"]";
+				noSuchFileError = "Rythem cannot resolve this path["+this._replace+"]";
 				_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 			}
 			return _replaceContent;
@@ -136,7 +136,7 @@ package com.webpluz.vo{
 			//if(obj && obj.projects && obj.projects[0] && obj.projects[0]){
 				var includes:Array = obj.projects[0]['include'];
 				var fileStream:FileStream = new FileStream();
-				var folder:String = this._replaceUrl.substring(0,this._replaceUrl.lastIndexOf("/")+1);
+				var folder:String = this._replace.substring(0,this._replace.lastIndexOf("/")+1);
 				for each(var i:String in includes){
 					i = i.replace("./","");
 					fileToRead = File.userDirectory.resolvePath(folder+i);
@@ -156,23 +156,23 @@ package com.webpluz.vo{
 		}
 		
 		public function get pattern():String{
-			return this._urlRule;
+			return this._pattern;
 		}
 		public function set pattern(value:String):void{
-			if(this._urlRule == value){
+			if(this._pattern == value){
 				return;
 			}
 			this._replaceContent = '';
-			this._urlRule = value;
+			this._pattern = value;
 			
 		}
 		public function get replace():String{
-			return this._replaceUrl;
+			return this._replace;
 		}
 		public function set replace(value:String):void{
-			if(this._replaceUrl != value){
+			if(this._replace != value){
 				this._replaceContent = '';
-				this._replaceUrl = value;
+				this._replace = value;
 				var tmpFile:File = File.userDirectory.resolvePath(value);
 				if(tmpFile.exists){
 					this._isDirectoryRule = tmpFile.isDirectory;

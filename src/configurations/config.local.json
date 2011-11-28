@@ -5,7 +5,7 @@
 			"enable": true,
 			"rules": [
 				{"enable":true, "type":"file", 	"pattern":"http://appx.qq.com/app/mycenter/?app", 	"replace":"D:\\ippan\\svn\\appx.qq.com\\app\\mycenter\\index.html"},
-				{"enable":true, "type":"file",		"pattern":"http://appx.qq.com/app/mycenter/",	"replace":"D:\\ippan\\svn\\appx.qq.com\\app\\mycenter\\"},
+				{"enable":true, "type":"file",		"pattern":"http://appx.qq.com/app/mycenter/",	"replace":"D:\\ippan\\svn\\appx.qq.com\\app\\mycenter\\"}
 			]
 		}
 	]

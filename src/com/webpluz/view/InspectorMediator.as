@@ -45,7 +45,8 @@ package com.webpluz.view{
 						requestInspector.text = "empty..";
 					}
 					if(res){
-						responseInspector.text = res.rawData || "empty...";
+						//responseInspector.text = res.rawData || "empty...";
+						responseInspector.text = res.headerRawData +"\r\n\r\n"+ res.bodyUncompressed;
 					}else{
 						responseInspector.text = "empty..";
 					}

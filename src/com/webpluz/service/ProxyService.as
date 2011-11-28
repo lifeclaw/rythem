@@ -101,6 +101,12 @@ package com.webpluz.service{
 				trace(e.toString());
 				return false;
 			}
+			
+			
+			// do some test..
+			testChunkedAndGzip();
+			
+			
 			trace("listened to "+this._address+":"+this._port);
 			return true;
 		}
@@ -167,13 +173,19 @@ package com.webpluz.service{
 			//}
 			this.generateConnecttion();
 			*/
+			
+			this.addPipe(e.socket);
+		}
+		
+		protected function addPipe(socket:Socket):void{
 			var proxy:URI = this._systemProxyConfig ? this._systemProxyConfig.serverURI : null;
-			var pipe:Pipe=new Pipe(e.socket,_pipeCount++, proxy);
+			var pipe:Pipe=new Pipe(socket,_pipeCount++, proxy);
 			//_pipeCount++;
 			pipe.addEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 			pipe.addEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
 			pipe.addEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
 			this._pipes.push(pipe);
+			
 		}
 		
 		protected function onPipeError(event:PipeEvent):void{
@@ -188,14 +200,14 @@ package com.webpluz.service{
 		protected function onPipeConnected(event:PipeEvent):void{
 			var e2:PipeEvent = (event.clone() as PipeEvent);
 			if(this.storePipe(e2)){
-				trace("remove pipe when CONNECT "+e2.pipeId);
+				//trace("remove pipe when CONNECT "+e2.pipeId);
 				var pipeToRemove:Pipe=event.target as Pipe;
-				trace("onPipeConnected before remove:"+this._pipes.length);
+				//trace("onPipeConnected before remove:"+this._pipes.length);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
 				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
-				trace("onPipeConnected after remove:"+this._pipes.length);
+				//trace("onPipeConnected after remove:"+this._pipes.length);
 				this.generateConnecttion();
 			}
 			//trace("event="+event.type,event.pipeId,event.requestData.server,event.requestData.path);
@@ -207,13 +219,13 @@ package com.webpluz.service{
 			var e2:PipeEvent = (event.clone() as PipeEvent);
 			if(this.storePipe(e2)){
 				var pipeToRemove:Pipe=event.target as Pipe;
-				trace("before remove:"+this._pipes.length);
+				//trace("before remove:"+this._pipes.length);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_COMPLETE, this.onPipeComplete);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_ERROR, this.onPipeError);
 				pipeToRemove.removeEventListener(PipeEvent.PIPE_CONNECTED, this.onPipeConnected);
 				this._pipes.splice(this._pipes.indexOf(pipeToRemove), 1);
 				
-				trace("after remove:"+this._pipes.length);
+				//trace("after remove:"+this._pipes.length);
 				this.generateConnecttion();
 			}
 			//this.dispatchEvent(e2);
@@ -280,7 +292,7 @@ package com.webpluz.service{
 			return o;
 		}
 		private function storePipe(event:PipeEvent):Boolean{
-			trace("====stroePipe:"+event.type+" ["+event.requestData+"] ["+event.responseData+"] "+" ["+event.pipeId+"] ");
+			//trace("====stroePipe:"+event.type+" ["+event.requestData+"] ["+event.responseData+"] "+" ["+event.pipeId+"] ");
 			var pipeDataExists:Boolean = true;
 			var pipe:Object = getPipeDataById(event.pipeId);
 			if(!pipe){
@@ -299,9 +311,23 @@ package com.webpluz.service{
 			}
 			pipe['pipeId'] = event.pipeId;
 			_pipeDatas["-"+event.pipeId] = pipe;
-			trace("====stroePipe END:"+event.type+" ["+pipe.requestData+"] ["+pipe.responseData+"] "+" ["+pipe.pipeId+"] ");
+			//trace("====stroePipe END:"+event.type+" ["+pipe.requestData+"] ["+pipe.responseData+"] "+" ["+pipe.pipeId+"] ");
 			
 			return pipeDataExists;
+		}
+		
+		
+		// TODO
+		
+		private var testSocket:Socket;
+		public function testChunkedAndGzip():void{
+			var str:String="GET http://www.gdutbbs.com/ HTTP/1.1\r\nHost: www.gdutbbs.com\r\nProxy-Connection: keep-alive\r\nX-Purpose: instant\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: zh-CN,zh;q=0.8\r\nAccept-Charset: gb18030,utf-8;q=0.7,*;q=0.3\r\n\r\n\r\n";
+			testSocket = new Socket("www.gdutbb.som",80);
+			//this.addPipe(testSocket);
+			testSocket.addEventListener(Event.CONNECT,function(e:Event):void{
+				testSocket.writeUTFBytes(str);
+			});
+			testSocket.connect("127.0.0.1",8080);
 		}
 		
 	}

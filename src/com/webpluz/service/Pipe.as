@@ -1,8 +1,11 @@
 // from http://httpeek.googlecode.com/
 package com.webpluz.service{
 	import com.jo2.net.URI;
+	import com.webpluz.vo.ContentReplaceRule;
+	import com.webpluz.vo.IpReplaceRule;
 	import com.webpluz.vo.RequestData;
 	import com.webpluz.vo.ResponseData;
+	import com.webpluz.vo.Rule;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -14,9 +17,6 @@ package com.webpluz.service{
 	import flash.net.URLRequestHeader;
 	import flash.net.dns.DNSResolver;
 	import flash.utils.ByteArray;
-	import com.webpluz.vo.ContentReplaceRule;
-	import com.webpluz.vo.IpReplaceRule;
-	import com.webpluz.vo.Rule;
 	
 	[Event(name="PIPE_CONNECTED", type="com.webpluz.service.PipeEvent")]
 	[Event(name="PIPE_COMPLETE", type="com.webpluz.service.PipeEvent")]
@@ -34,9 +34,6 @@ package com.webpluz.service{
 		
 		private var responseContentLength:Number;
 		private var responseChunked:Boolean;
-		private var responseChunkLastLen:Number=0;
-		private var responseChunkLastRead:Number=0;
-		private var responseBodyBuffer:ByteArray;
 		
 		
 		private var requestData:RequestData;
@@ -69,7 +66,6 @@ package com.webpluz.service{
 			
 			this.requestBuffer=new ByteArray();
 			this.responseBuffer=new ByteArray();
-			this.responseBodyBuffer = new ByteArray();
 			this.requestHeaderFound=false;
 			this.responseHeaderFound=false;
 			this.responseContentLength=0;
@@ -98,7 +94,7 @@ package com.webpluz.service{
 						requestData.body = bufferString.substr(headerBodyDivision);
 					}
 					
-					if(false){//@TODO disable cache,remove "If-Modified-Since"
+					if(true){//@TODO disable cache,remove "If-Modified-Since"
 						headerString = headerString.replace(/If\-modified\-since.*?\r\n/i,"");
 					}
 					headerString = headerString.replace(/proxy\-connection.*?\r\n/i,"");
@@ -140,7 +136,7 @@ package com.webpluz.service{
 					if(this.requestBuffer.bytesAvailable > headerBodyDivision){
 						newRequestBuffer.writeBytes(this.requestBuffer, headerBodyDivision);
 					}
-					trace(newRequestBuffer.toString());
+					//(newRequestBuffer.toString());
 					this.requestBuffer=newRequestBuffer;
 					if(this.requestData.port == 443){//
 						this.done();
@@ -176,9 +172,9 @@ package com.webpluz.service{
 					}
 					*/
 				
-					trace("header "+this._indexId+"  \n"+this.requestBuffer.toString());
+					//trace("header "+this._indexId+"  \n"+this.requestBuffer.toString());
 				}else{
-					trace("no header "+this._indexId);
+					//trace("no header "+this._indexId);
 				}
 			}else{
 				if (this.responseSocket.connected){
@@ -218,7 +214,6 @@ package com.webpluz.service{
 			this.responseSocket.readBytes(this.responseBuffer, position, this.responseSocket.bytesAvailable);
 			this.requestSocket.writeBytes(this.responseBuffer, position);
 			this.requestSocket.flush();
-			this.responseData.rawData = this.responseBuffer.toString();
 			if (!this.responseHeaderFound){
 				// Make a string version and check if we've received all the headers yet.
 				var bufferString:String=this.responseBuffer.toString();
@@ -238,87 +233,71 @@ package com.webpluz.service{
 					//TODO need dispath event when got response header?
 					//this.dispatchEvent(this.headerEvent);
 					
-					this.responseBuffer.position = headerCheck + 4;//TODO error when server return "\n\n" as body's seperator
+					this.responseData.rawDataInByteArray = this.responseBuffer;
 				}
+				
 			}
 			
 			if (this.responseData.resultCode == "204" ||  this.responseData.resultCode == "304" || this.responseData.resultCode == "302"
 				|| this.responseData.resultCode == "307"){
+				this.responseData.rawDataInByteArray = this.responseBuffer;
 				this.done();
 			} else if (this.responseChunked){
 				// TODO get body to resposneData
-				if (this.readChunckedData(this.responseBuffer)){
-					//trace(this.responseData.body);
-					this.responseData.body += this.responseBodyBuffer.toString();
+				if (this.isChunkedResponseDone(this.responseBuffer)){
+					this.responseData.rawDataInByteArray = this.responseBuffer;
 					this.done();
 				}
 			} else if (this.responseBuffer.length == this.responseContentLength){
-				// TODO get body to resposneData
-				this.responseData.body+=this.responseBuffer.toString();
+				//TODO responseData.body
 				//trace(this.responseData.body);
-				this.done();
+				
+				// TODO  got the end and not found header(broken http response)
+				this.responseData.rawDataInByteArray = this.responseBuffer;
 			} else if(this.responseContentLength === 0){
+				this.responseData.rawDataInByteArray = this.responseBuffer;
 				this.done();
 			}
 			//trace("response data.."+this._indexId+" got header?"+(responseHeaderFound?"YES":this.responseBuffer.toString()));
 		}
 		
-		private function readChunckedData(response:ByteArray):Boolean{
-			response.position=0;
-			
-			// bug:when buffer has not complete
-			var headerTest:String=new String();
-			var bodyPosition:int = 0;
-			var m:int=0;
-			while (response.position < response.length){
-				m++;
-				if(m>1000){
-					trace("1 too long:m="+m);
-				}
-				headerTest+=response.readUTFBytes(1);
-				bodyPosition = headerTest.search(SEPERATOR);
-				if (bodyPosition != -1){
-					bodyPosition += 4
+		
+		private function isChunkedResponseDone(response:ByteArray):Boolean{
+			response.position = 0;
+			var headerTest:String = new String();
+			while (response.position < response.length)
+			{
+				headerTest += response.readUTFBytes(1);
+				if (headerTest.search(SEPERATOR) != -1)
+				{
 					break;
 				}
 			}
-			responseBodyBuffer.clear();
-			response.readBytes(responseBodyBuffer,response.position);
-			//trace(responseBodyBuffer.toString());
 			
-			response.position = bodyPosition;
-			//trace("++++++++++bodyPosition:"+bodyPosition);
-			
-			var lenString:String="0x";
-			var len:Number=0;
+			var lenString:String = "0x";
+			var len:Number = 0;
 			var byte:String;
-			/*
-			* chunked data example:
-			* \r\nF\r\nthis is content\r\n5\r\nhello\r\n0\r\n\r\n
-			*
-			*/
-			var n:int=0;
-			//trace('======response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable); 
-			while (response.position < response.length){
-				n++;
-				if(n>1000){
-					trace("tooooooooooooo long..");
-					//trace('response.length='+response.length+" response.position="+response.position+" response.bytesAvailable="+response.bytesAvailable);
-				}
-				byte=response.readUTFBytes(1);
-				if (byte == "\n"){
-					len=parseInt(lenString);
-					if (len == 0){
+			while (response.position < response.length)
+			{
+				byte = response.readUTFBytes(1);
+				if (byte == "\n")
+				{
+					len = parseInt(lenString);
+					if (len == 0)
+					{
 						return true;
 						break;
-					}else{
-						response.position+=(len + 2);// TODO:这里不需要判断是\r\n还是\n?
-						lenString="0x";
-						len=0;
-						//trace("body=",responseBodyBuffer.uncompress("gzip"));
 					}
-				}else{
-					lenString+=byte;
+					else
+					{
+						response.position += (len + 2);
+						lenString = "0x";
+						len = 0;
+					}
+				}
+				else
+				{
+					lenString += byte;
 				}
 			}
 			return false;
@@ -342,7 +321,7 @@ package com.webpluz.service{
 		
 		private function testSocket(socket:Socket):Boolean{
 			if (!socket.connected){
-				trace('not connect');
+				//trace('not connect');
 				this.done();
 				return false;
 			}
@@ -350,7 +329,7 @@ package com.webpluz.service{
 		}
 		
 		public function tearDown():void{
-			trace('teardown..');
+			//trace('teardown..');
 			_tearDowned = true;
 			if (this.requestSocket != null){
 				//trace('teardown..1');

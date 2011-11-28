@@ -4,10 +4,8 @@
 			"name": "Some Project",
 			"enable": true,
 			"rules": [
-				{"enable":true, "type":"file", 	"pattern":"http://www.qq.com/test", 	"replace":"D:\\test.txt"},
-				{"enable":true, "type":"file",		"pattern":"http://www.qq.com/match/*",	"replace":"D:\\test.txt"},
-				{"enable":true, "type":"dir", 		"pattern":"http://www.qq.com/test/", 	"replace":"D:\\test"},
-				{"enable":true, "type":"combine",	"pattern":"http://www.qq.com/abc.js",	"replace":"D:\\test.qzmin"}
+				{"enable":true, "type":"file", 	"pattern":"http://appx.qq.com/app/mycenter/?app", 	"replace":"D:\\ippan\\svn\\appx.qq.com\\app\\mycenter\\index.html"},
+				{"enable":true, "type":"file",		"pattern":"http://appx.qq.com/app/mycenter/",	"replace":"D:\\ippan\\svn\\appx.qq.com\\app\\mycenter\\"},
 			]
 		}
 	]

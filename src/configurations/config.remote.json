@@ -4,8 +4,10 @@
 			"name": "Test Env",
             "enable": true,
 			"rules": [
-				{"enable":true, "type":"host", "pattern":"www.qq.com", "replace":"127.0.0.1"},
-				{"enable":true, "type":"host", "pattern":"web.qq.com", "replace":"127.0.0.1"}
+				{"enable":true, "type":"host", "pattern":"app.qplus.com", "replace":"10.137.10.232"},
+				{"enable":true, "type":"host", "pattern":"cdn.qplus.com", "replace":"10.133.41.165"},
+				{"enable":true, "type":"host", "pattern":"test.vm.qplus.com", "replace":"10.133.41.165"},
+				{"enable":true, "type":"host", "pattern":"cgi.appx.qq.com", "replace":"10.134.6.158"}
 			]
 		}
 	]

@@ -35,7 +35,8 @@ package com.webpluz.vo{
 				*    any rule above without '/'
 				*/
 				//if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
-				if(requestData.fullUrl.indexOf(this._pattern)!=-1){
+				
+				if(requestData.fullUrl.indexOf(this._pattern) !=-1){// (requestData.fullUrl.lastIndexOf('/') - this._pattern.length +(isPatternHasEnd?1:0))){
 					return true;
 				}
 				return false;
@@ -80,21 +81,17 @@ package com.webpluz.vo{
 			var contentType:String = contentTypeMappings[tmp2[tmp2.length-1].toString().toLowerCase()] || "text/html";
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
-					var isReplaceHasEnd:Boolean;
-					var additionalPath:String;
 					var filePath:String;
-					
-					additionalPath = requestData.fullUrl.substr(requestData.fullUrl.indexOf(this._pattern)+this._pattern.length+1);
+					var isPatternHasEnd:Boolean = this._replace.charAt(this._replace.length-1) == "/";
+					var additionalPath:String =  requestData.fullUrl.substr(this._pattern.indexOf(requestData.fullUrl)+this._pattern.length+1);
 					if(Capabilities.os.indexOf("Windows")!=-1){
-						isReplaceHasEnd = this._replace.charAt(this._replace.length-1) == "\\";
-						additionalPath = additionalPath.replace(/\//g,"\\");
-						additionalPath = (isReplaceHasEnd?"":"\\")+additionalPath;
+						isPatternHasEnd = this._replace.charAt(this._replace.length-1) == "\\";
+						additionalPath = additionalPath.replace(new RegExp(/\//g),"\\");
+						filePath = this._replace+(isPatternHasEnd?'':"\\")+additionalPath;
 					}else{
-						isReplaceHasEnd = this._replace.charAt(this._replace.length-1) == "/";
-						additionalPath = (isReplaceHasEnd?"":"/")+additionalPath;
-						
+						filePath = this._replace+(isPatternHasEnd?'':'/')+additionalPath;
 					}
-					filePath = this._replace+additionalPath;
+					
 					_file = File.userDirectory.resolvePath(filePath);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);

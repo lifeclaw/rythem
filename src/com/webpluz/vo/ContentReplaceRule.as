@@ -4,7 +4,8 @@ package com.webpluz.vo{
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-
+	import flash.system.Capabilities;
+	
 	public class ContentReplaceRule extends Rule{
 		
 		private var _file:File;
@@ -28,17 +29,16 @@ package com.webpluz.vo{
 			
 			if(this._isDirectoryRule){
 				/*
-				 *  rule:  http://a.b.c/d/    => d:/dsite/
-				 *  rule:  /e/f/g/            => d:/anysite/efg/
-				 *  rule:  a.b.c/d/           => 
-				 *    any rule above without '/'
-				 */
+				*  rule:  http://a.b.c/d/    => d:/dsite/
+				*  rule:  /e/f/g/            => d:/anysite/efg/
+				*  rule:  a.b.c/d/           => 
+				*    any rule above without '/'
+				*/
 				//if(requestData.path.lastIndexOf('/') != requestData.path.length-1){
-					var isPatternHasEnd:Boolean = this._pattern.lastIndexOf("/") == this._pattern.length -1;
-					if(requestData.fullUrl.indexOf(this._pattern) == (requestData.fullUrl.lastIndexOf('/') - this._pattern.length +(isPatternHasEnd?1:0))){
-						return true;
-					}
-					return false;
+				if(requestData.fullUrl.indexOf(this._pattern)!=-1){
+					return true;
+				}
+				return false;
 				//}else{
 				//	return false;
 				//}
@@ -80,8 +80,21 @@ package com.webpluz.vo{
 			var contentType:String = contentTypeMappings[tmp2[tmp2.length-1].toString().toLowerCase()] || "text/html";
 			if(_file.exists){
 				if(_isDirectoryRule){// directory match
-					//TODO test in windows
-					var filePath:String = this._replace+(_replace.charAt(_replace.length-1)=='/'?'':'/')+fileName;
+					var isReplaceHasEnd:Boolean;
+					var additionalPath:String;
+					var filePath:String;
+					
+					additionalPath = requestData.fullUrl.substr(requestData.fullUrl.indexOf(this._pattern)+this._pattern.length+1);
+					if(Capabilities.os.indexOf("Windows")!=-1){
+						isReplaceHasEnd = this._replace.charAt(this._replace.length-1) == "\\";
+						additionalPath = additionalPath.replace(/\//g,"\\");
+						additionalPath = (isReplaceHasEnd?"":"\\")+additionalPath;
+					}else{
+						isReplaceHasEnd = this._replace.charAt(this._replace.length-1) == "/";
+						additionalPath = (isReplaceHasEnd?"":"/")+additionalPath;
+						
+					}
+					filePath = this._replace+additionalPath;
 					_file = File.userDirectory.resolvePath(filePath);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
@@ -134,22 +147,22 @@ package com.webpluz.vo{
 			var fileToRead:File;
 			//TODO validate the qzmin file content
 			//if(obj && obj.projects && obj.projects[0] && obj.projects[0]){
-				var includes:Array = obj.projects[0]['include'];
-				var fileStream:FileStream = new FileStream();
-				var folder:String = this._replace.substring(0,this._replace.lastIndexOf("/")+1);
-				for each(var i:String in includes){
-					i = i.replace("./","");
-					fileToRead = File.userDirectory.resolvePath(folder+i);
-					//fileToRead = new File(i);
-					if(fileToRead.exists){
-						fileStream.open(fileToRead,FileMode.READ);
-						result += fileStream.readUTFBytes(fileStream.bytesAvailable);
-						fileStream.close();
-					}else{
-						//TODO 
-						trace("no such file "+i);
-					}
+			var includes:Array = obj.projects[0]['include'];
+			var fileStream:FileStream = new FileStream();
+			var folder:String = this._replace.substring(0,this._replace.lastIndexOf("/")+1);
+			for each(var i:String in includes){
+				i = i.replace("./","");
+				fileToRead = File.userDirectory.resolvePath(folder+i);
+				//fileToRead = new File(i);
+				if(fileToRead.exists){
+					fileStream.open(fileToRead,FileMode.READ);
+					result += fileStream.readUTFBytes(fileStream.bytesAvailable);
+					fileStream.close();
+				}else{
+					//TODO 
+					trace("no such file "+i);
 				}
+			}
 			//}
 			trace(result);
 			return result;

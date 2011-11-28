@@ -51,6 +51,9 @@ package com.webpluz.vo {
 			return _rawByteArray;
 		}
 		public function get bodyUncompressed():String{
+			if(!this.headersObject){
+				return "requesting...";
+			}
 			if(!this.decoded){
 				this.decoded = true;
 				var tmp:ByteArray;

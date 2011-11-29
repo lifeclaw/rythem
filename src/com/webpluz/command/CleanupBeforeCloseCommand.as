@@ -29,20 +29,10 @@ package com.webpluz.command
 			var proxyService:ProxyService = (facade.retrieveProxy(ProxyService.NAME) as ProxyService);
 			proxyService.close();
 			
-			/*
+
 			//save rules
-			var localText:String = '{\
-	"projects": [\
-		{\
-			"name": "Some Project",\
-			"enable": true,\
-			"rules": [';
-			var remoteText:String = '{\
-	"projects": [\
-		{\
-			"name": "Test Env",\
-            "enable": true,\
-			"rules": [';
+			var localText:String = '{"projects": [{"name": "Some Project","enable": true,"rules": [';
+			var remoteText:String = '{"projects": [{"name": "Test Env","enable": true,"rules": [';
 			
 			var rules:Array = RuleManager.getInstance().rules;
 			for(var i:int=0,l:int=rules.length;i<l;++i){
@@ -51,33 +41,27 @@ package com.webpluz.command
 					var r:Rule = tmp[j];
 					if(r.type == Rule.RULE_TYPE_REPLACE_IP){
 						var r1:IpReplaceRule = r as IpReplaceRule;
-						remoteText += '{"enable:"'+r1.enable+',"pattern":"'+r1.pattern+'","replace":"'+r1.replace+'"}';
-						if(j != tmp.length){
-							remoteText+=",";
-						}
+						remoteText += '{"type":"File","enable:"'+r1.enable+',"pattern":"'+r1.pattern+'","replace":"'+r1.replace+'"},';
 					}else{
 						var r2:ContentReplaceRule = r as ContentReplaceRule;
-						localText += '{"enable:"'+r2.enable+',"pattern":"'+r2.pattern+'","replace":"'+r2.replace+'"}';
-						if(j != tmp.length){
-							localText+=",";
-						}
+						localText += '{"enable":'+r2.enable+',"pattern":"'+r2.pattern+'","replace":"'+r2.replace+'"},';
 					}
 				}
 			}
-			remoteText+=']\
-		}\
-	]\
-}';
-			localText+=']\
-		}\
-	]\
-}';
-			var localF:File = File.applicationDirectory.resolvePath(ConfigModel.LOCAL_CONFIG_PATH);
-			var remoteF:File = File.applicationDirectory.resolvePath(ConfigModel.REMOTE_CONFIG_PATH);
+			remoteText = remoteText.replace(/,$/g,"");
+			localText = localText.replace(/,$/g,"");
+			
+			remoteText+=']}]}';
+			localText+=']}]}';
+			var localF:File = File.applicationStorageDirectory.resolvePath(ConfigModel.LOCAL_CONFIG_PATH);
+			var remoteF:File = File.applicationStorageDirectory.resolvePath(ConfigModel.REMOTE_CONFIG_PATH);
 			var fs:FileStream = new FileStream;
-			fs.open(localF,FileMode.WRITE);
+			
+			localText = localText.replace(/\\/g,'\\\\');
+			fs.open(localF,FileMode.UPDATE);
 			fs.writeUTFBytes(localText);
-			*/
+			fs.close();
+
 			//restore proxy configurations
 			if(ProxyManager && ProxyManager.newInstance()){
 				ProxyManager.newInstance().restoreSystemProxyConfig();

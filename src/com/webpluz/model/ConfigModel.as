@@ -7,6 +7,8 @@ package com.webpluz.model
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	
@@ -51,7 +53,23 @@ package com.webpluz.model
 		public function loadLocalConfig():void{
 			if(localConfig.exists){
 				trace('[ConfigModel] local config complete');
-				this.processRawConfigDate(FileUtils.readUTFBytes(localConfig));
+				var localContent:String;
+				var storedFile:File = File.applicationStorageDirectory.resolvePath(LOCAL_CONFIG_PATH);
+				if(storedFile.exists){
+					
+					localContent = FileUtils.readUTFBytes(storedFile);
+					storedFile.deleteFile();
+				}else{
+					localContent = FileUtils.readUTFBytes(localConfig);
+					/*
+					var fs:FileStream = new FileStream;
+					fs.open(storedFile,FileMode.UPDATE);
+					fs.writeUTFBytes(localContent);
+					*/
+					//FileUtils.writeUTFBytes(storedFile,localContent);
+				}
+				this.processRawConfigDate(localContent);
+				trace('[ConfigModel] local config:');
 				this.sendNotification(UPDATE, projects);
 			}
 			else trace('[ConfigModel] local config is missing');

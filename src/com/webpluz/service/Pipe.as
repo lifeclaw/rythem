@@ -146,7 +146,7 @@ package com.webpluz.service{
 					
 
 					//if proxy is needed here, create a ProxySocket rather than a normal Socket
-					if(this.requestData.server.indexOf("qq.com")==-1 && this._proxy){
+					if((this.requestData.server.indexOf("qq.com")==-1 &&this.requestData.server.indexOf("oa.com")==-1) && this._proxy){
 						trace('RESPONSE SOCKET AS PROXY SOCKET', _proxy);
 						this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
 					}

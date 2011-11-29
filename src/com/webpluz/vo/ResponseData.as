@@ -45,7 +45,18 @@ package com.webpluz.vo {
 		public function set rawDataInByteArray(ba:ByteArray):void{
 			_rawByteArray.clear();
 			//trace("writing bodyRawDataByteArray:"+ba.toString());
-			this.rawData = ba.toString();
+			//Content-Type: text/html; charset=iso-8859-1
+			var tmp:Array;
+			if(this.headersObject){
+				tmp = String(this.headersObject['content-type']).split('; ');
+				if(tmp.length>=2){
+					tmp = tmp[1].split('=');
+				}
+			}
+			var charSet:String = tmp[1] || 'gb18030';
+			ba.position = 0;
+			this.rawData = ba.readMultiByte(ba.length,charSet);
+			//this.rawData = ba.toString();
 			_rawByteArray.writeBytes(ba);
 		}
 		public function get rawDataInByteArray():ByteArray{
@@ -117,7 +128,6 @@ package com.webpluz.vo {
 						retArray.writeUTF("\r\n");
 						break;
 					}else{
-						
 						retArray.writeBytes(src,src.position,len);
 						src.position += (len + 2);//TODO check if the newline is \r\n or \n
 						lenString = "0x";

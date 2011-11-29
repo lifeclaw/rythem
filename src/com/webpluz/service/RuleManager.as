@@ -83,6 +83,11 @@ package com.webpluz.service{
 					break;
 			}
 		}
+		
+		public function get rules():Array{
+			return [rulesHigh,rulesNormal,rulesLow];
+		}
+		
 		public function getRule(requestData:RequestData):Rule{
 			for(var i:int=0,l:int=rulesHigh.length;i<l;++i){
 				if(rulesHigh[i].isMatch(requestData)){

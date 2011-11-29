@@ -18,8 +18,8 @@ package com.webpluz.model
 		public static const NAME:String = 'ConfigModel';
 		public static const UPDATE:String = 'model.config.update';
 		
-		private static const LOCAL_CONFIG_PATH:String = 'configurations/config.local.json';
-		private static const REMOTE_CONFIG_PATH:String = 'configurations/config.remote.json';
+		public static const LOCAL_CONFIG_PATH:String = 'configurations/config.local.json';
+		public static const REMOTE_CONFIG_PATH:String = 'configurations/config.remote.json';
 		
 		private var localConfig:File;
 		private var remoteConfig:URLLoader;

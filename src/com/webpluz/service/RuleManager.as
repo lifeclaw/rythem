@@ -84,19 +84,19 @@ package com.webpluz.service{
 			}
 		}
 		public function getRule(requestData:RequestData):Rule{
-			for each(var r:Rule in rulesHigh){
-				if(r.isMatch(requestData)){
-					return r;
+			for(var i:int=0,l:int=rulesHigh.length;i<l;++i){
+				if(rulesHigh[i].isMatch(requestData)){
+					return rulesHigh[i];
 				}
 			}
-			for each(r in rulesNormal){
-				if(r.isMatch(requestData)){
-					return r;
+			for(i=0,l=rulesNormal.length;i<l;++i){
+				if(rulesNormal[i].isMatch(requestData)){
+					return rulesNormal[i];
 				}
 			}
-			for each(r in rulesLow){
-				if(r.isMatch(requestData)){
-					return r;
+			for(i=0,l=rulesLow.length;i<l;++i){
+				if(rulesLow[i].isMatch(requestData)){
+					return rulesLow[i];
 				}
 			}
 			return null;

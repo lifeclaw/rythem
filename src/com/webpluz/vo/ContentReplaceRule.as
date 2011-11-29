@@ -44,7 +44,9 @@ package com.webpluz.vo{
 				//	return false;
 				//}
 			}else{
-				return (this._pattern.indexOf(requestData.fullUrl) == 0);
+				// pattern: http://a.b.c/
+				// url: http://a.b.c/adfs
+				return (requestData.fullUrl.indexOf(this._pattern) == 0);
 			}
 		}
 		public function getContent(requestData:RequestData=null):String{

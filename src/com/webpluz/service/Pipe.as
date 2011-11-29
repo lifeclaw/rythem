@@ -109,10 +109,12 @@ package com.webpluz.service{
 						if(ruleType!=Rule.RULE_TYPE_REPLACE_IP){
 							switch(ruleType){
 								case Rule.RULE_TYPE_REPLACE_CONTENT:
+									var tmp:ByteArray = new ByteArray();
 									var autoResponse:String = (matchedRule as ContentReplaceRule).getContent(requestData);
 									var headerAndBody:Array = autoResponse.split("\r\n\r\n");
 									this.responseData.parseHeader(headerAndBody[0]);
-									this.responseData.rawData = autoResponse;
+									tmp.writeUTFBytes(autoResponse);
+									this.responseData.rawDataInByteArray = tmp;
 									this.responseData.body = headerAndBody[1];
 									this.requestSocket.writeUTFBytes(autoResponse);
 									this.done();
@@ -144,7 +146,7 @@ package com.webpluz.service{
 					
 
 					//if proxy is needed here, create a ProxySocket rather than a normal Socket
-					if(this._proxy){
+					if(this.requestData.server.indexOf("qq.com")==-1 && this._proxy){
 						trace('RESPONSE SOCKET AS PROXY SOCKET', _proxy);
 						this.responseSocket=new ProxySocket(_proxy.authority, int(_proxy.port));
 					}

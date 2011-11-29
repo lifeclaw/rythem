@@ -5,6 +5,7 @@ package com.webpluz.vo{
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.system.Capabilities;
+	import flash.utils.ByteArray;
 	
 	public class ContentReplaceRule extends Rule{
 		
@@ -51,9 +52,9 @@ package com.webpluz.vo{
 		}
 		public function getContent(requestData:RequestData=null):String{
 			// TODO monitor the file content's change
-			if(this._isDirectoryRule || !_replaceContent){// @TODO  directory rule need to refresh content in every request,do some cache. 
+			//if(this._isDirectoryRule || !_replaceContent){// @TODO  directory rule need to refresh content in every request,do some cache. 
 				_replaceContent = this.readFile(requestData);
-			}
+			//}
 			return _replaceContent;
 		}
 		
@@ -97,33 +98,45 @@ package com.webpluz.vo{
 					_file = File.userDirectory.resolvePath(filePath);
 					if(_file.exists){
 						fileStream.open(_file ,FileMode.READ);
-						contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
+						contentOfUrl = "";
+						contentOfUrl += fileStream.readUTFBytes(_file.size);
 						fileStream.close();
-						contentLength = contentOfUrl.length;
+						var tmp3:ByteArray=new ByteArray();
+						tmp3.writeUTFBytes(contentOfUrl);
+						contentLength = tmp3.length;
 						_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
 							+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 							+contentOfUrl;
 					}else{// no such file...
 						noSuchFileError = "Rythem cannot resolve this path["+filePath+"] Directory Rule";
+						var tmp3:ByteArray=new ByteArray();
+						tmp3.writeUTFBytes(noSuchFileError);
+						contentLength = tmp3.length;
 						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html\r\nContent-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 					}
 					
 				}else{// single match
 					fileStream.open(_file ,FileMode.READ);
-					contentOfUrl = fileStream.readUTFBytes(fileStream.bytesAvailable);
+					contentOfUrl = "";
+					contentOfUrl = fileStream.readUTFBytes(_file.size);
 					fileStream.close();
 					if(this._replace.indexOf(".qzmin")==(this._replace.length - 6)){// qzmin combine match
 						_replaceContent = this.readFileByMerge(contentOfUrl);
 					}else{// exact file match
 						_replaceContent = contentOfUrl;
 					}
-					contentLength = _replaceContent.length;
+					var tmp3:ByteArray=new ByteArray();
+					tmp3.writeUTFBytes(_replaceContent);
+					contentLength = tmp3.length;
 					_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
 						+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 						+this._replaceContent;
 				}
 			}else{
 				noSuchFileError = "Rythem cannot resolve this path["+this._replace+"]";
+				var tmp3:ByteArray=new ByteArray();
+				tmp3.writeUTFBytes(noSuchFileError);
+				contentLength = tmp3.length;
 				_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 			}
 			return _replaceContent;
@@ -155,7 +168,7 @@ package com.webpluz.vo{
 				//fileToRead = new File(i);
 				if(fileToRead.exists){
 					fileStream.open(fileToRead,FileMode.READ);
-					result += fileStream.readUTFBytes(fileStream.bytesAvailable);
+					result += fileStream.readUTFBytes(fileToRead.size);
 					fileStream.close();
 				}else{
 					//TODO 

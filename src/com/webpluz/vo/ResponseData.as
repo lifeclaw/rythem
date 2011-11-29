@@ -15,6 +15,7 @@ package com.webpluz.vo {
 		private var _bodyUncompressed:String;
 		private var _rawByteArray:ByteArray = new ByteArray();
 		private static const NL:RegExp=new RegExp(/\r?\n/);
+		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		public var serverIp:String;
 		private var decoded:Boolean = false;
 		public function ResponseData(headerString:String="") {
@@ -57,31 +58,39 @@ package com.webpluz.vo {
 			if(!this.decoded){
 				this.decoded = true;
 				var tmp:ByteArray;
-				// check chunked
-				if(this.headersObject['transfer-encoding'] == 'chunked'){
-					tmp = parseChunkedData(rawDataInByteArray);
-				}else{
-					tmp = rawDataInByteArray;
-				}
 				
-				// check gzip
-				if(tmp && this.headersObject['content-encoding'] == 'gzip'){
-					var gzipBytesEncoder:GZIPBytesEncoder = new GZIPBytesEncoder();
-					//trace(this.rawDataInByteArray.toString());
-					try{
-						tmp.position = 0;//重要!!!!!!!
-						tmp = gzipBytesEncoder.uncompressToByteArray(tmp);
-					}catch(e:Error){
-						trace(e.message);
+				
+				
+				if(this.headersObject['content-encoding'] != 'gzip' &&
+					this.headersObject['transfer-encoding'] != 'chunked'){
+					_bodyUncompressed = this.rawData.split(SEPERATOR)[1];
+				}else{
+					
+					// check chunked
+					if(this.headersObject['transfer-encoding'] == 'chunked'){
+						tmp = parseChunkedData(rawDataInByteArray);
+					}else{
+						tmp = rawDataInByteArray;
 					}
+					
+					// check gzip
+					if(tmp && this.headersObject['content-encoding'] == 'gzip'){
+						var gzipBytesEncoder:GZIPBytesEncoder = new GZIPBytesEncoder();
+						//trace(this.rawDataInByteArray.toString());
+						try{
+							tmp.position = 0;//重要!!!!!!!
+							tmp = gzipBytesEncoder.uncompressToByteArray(tmp);
+						}catch(e:Error){
+							trace(e.message);
+						}
+					}
+					_bodyUncompressed = tmp.toString();
 				}
-				_bodyUncompressed = tmp.toString();
 			}
 			return _bodyUncompressed;
 		}
 		
 		
-		private static const SEPERATOR:RegExp=new RegExp(/\r?\n\r?\n/);
 		protected function parseChunkedData(src:ByteArray):ByteArray{
 			var retArray:ByteArray = new ByteArray();
 			var tmpPosition:uint = src.position;

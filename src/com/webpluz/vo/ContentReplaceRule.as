@@ -1,11 +1,16 @@
 package com.webpluz.vo{
 	
 	
+	
+	import com.webpluz.utils.StringUtil;
+	
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.system.Capabilities;
 	import flash.utils.ByteArray;
+	
+	import mx.core.ByteArrayAsset;
 	
 	public class ContentReplaceRule extends Rule{
 		
@@ -109,9 +114,7 @@ package com.webpluz.vo{
 							+contentOfUrl;
 					}else{// no such file...
 						noSuchFileError = "Rythem cannot resolve this path["+filePath+"] Directory Rule";
-						var tmp3:ByteArray=new ByteArray();
-						tmp3.writeUTFBytes(noSuchFileError);
-						contentLength = tmp3.length;
+						contentLength = StringUtil.getByteLength(noSuchFileError);;
 						_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html\r\nContent-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 					}
 					
@@ -125,18 +128,15 @@ package com.webpluz.vo{
 					}else{// exact file match
 						_replaceContent = contentOfUrl;
 					}
-					var tmp3:ByteArray=new ByteArray();
-					tmp3.writeUTFBytes(_replaceContent);
-					contentLength = tmp3.length;
+					
+					contentLength = StringUtil.getByteLength(_replaceContent);;
 					_replaceContent = "HTTP/1.1 200 OK with automatic headers\r\nContent-Length: "
 						+contentLength+"\r\nCache-Control: max-age:0, must-revalidate\r\nContent-Type: "+contentType+"\r\n\r\n"
 						+this._replaceContent;
 				}
 			}else{
 				noSuchFileError = "Rythem cannot resolve this path["+this._replace+"]";
-				var tmp3:ByteArray=new ByteArray();
-				tmp3.writeUTFBytes(noSuchFileError);
-				contentLength = tmp3.length;
+				contentLength = StringUtil.getByteLength(noSuchFileError);;
 				_replaceContent = "HTTP/1.1 404 Not Found\r\nRythemTemplate: True\r\nContent-Type: text/html Content-Length:"+noSuchFileError.length+"\r\n\r\n"+noSuchFileError;
 			}
 			return _replaceContent;
